@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quack House</title>
+</head>
+
+<body>
+  <div id="app">
+    <h2 class="title">Quackhouse &#129414;</h2>
+    <div class="database_explorer">
+      <div id="tables"></div>
+      <button type="button" id="import_data_button">Import Data</button>
+      <input type="file" name="file" id="file" accept=".json, .csv, .parquet" style="display: none;" multiple />
+    </div>
+  </div>
+
+  <script type="module" src="/src/scripts/main.ts"></script>
+
+</body>
+
+</html>
