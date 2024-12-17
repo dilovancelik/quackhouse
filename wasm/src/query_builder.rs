@@ -11,7 +11,7 @@ struct Aggregation {
 
 impl fmt::Display for Aggregation {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        if self.aggregation_type == AggregationType::COUNT {
+        if self.aggregation_type == AggregationType::Count {
             write!(f, "count() {}", self.column.column)
         } else {
             write!(
@@ -35,7 +35,7 @@ impl fmt::Display for Filter {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let negate_str = if self.negate { "NOT " } else { "" };
         match self.operator {
-            OperatorType::EQUAL => {
+            OperatorType::Equal => {
                 assert_eq!(
                     self.values.len(),
                     1,
@@ -49,15 +49,15 @@ impl fmt::Display for Filter {
                     self.values.first().unwrap()
                 )
             }
-            OperatorType::IN => {
+            OperatorType::In => {
                 assert!(
-                    self.values.len() > 0,
+                    !self.values.is_empty(),
                     "In operator should have atleast one value"
                 );
                 let values = self.values.join(", ");
                 write!(f, "{} ({} in ({}))", negate_str, self.column, values)
             }
-            OperatorType::BETWEEN => {
+            OperatorType::Between => {
                 assert_eq!(
                     self.values.len(),
                     2,
@@ -75,9 +75,9 @@ impl fmt::Display for Filter {
 
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
 enum OperatorType {
-    EQUAL,
-    BETWEEN,
-    IN,
+    Equal,
+    Between,
+    In,
 }
 
 impl FromStr for OperatorType {
@@ -85,9 +85,9 @@ impl FromStr for OperatorType {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
-            "eq" => Ok(Self::EQUAL),
-            "between" => Ok(Self::BETWEEN),
-            "in" => Ok(Self::IN),
+            "eq" => Ok(Self::Equal),
+            "between" => Ok(Self::Between),
+            "in" => Ok(Self::In),
             _ => Err(()),
         }
     }
@@ -95,11 +95,11 @@ impl FromStr for OperatorType {
 
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
 enum AggregationType {
-    SUM,
-    AVG,
-    MIN,
-    MAX,
-    COUNT,
+    Sum,
+    Avg,
+    Min,
+    Max,
+    Count,
 }
 
 impl FromStr for AggregationType {
@@ -107,11 +107,11 @@ impl FromStr for AggregationType {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
-            "sum" => Ok(AggregationType::SUM),
-            "avg" => Ok(AggregationType::AVG),
-            "min" => Ok(AggregationType::MIN),
-            "max" => Ok(AggregationType::MAX),
-            "count" => Ok(AggregationType::COUNT),
+            "sum" => Ok(AggregationType::Sum),
+            "avg" => Ok(AggregationType::Avg),
+            "min" => Ok(AggregationType::Min),
+            "max" => Ok(AggregationType::Max),
+            "count" => Ok(AggregationType::Count),
             _ => Err(()),
         }
     }
@@ -120,11 +120,11 @@ impl FromStr for AggregationType {
 impl fmt::Display for AggregationType {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let outstring = match self {
-            AggregationType::SUM => "sum",
-            AggregationType::AVG => "avg",
-            AggregationType::MIN => "min",
-            AggregationType::MAX => "max",
-            AggregationType::COUNT => "count",
+            AggregationType::Sum => "sum",
+            AggregationType::Avg => "avg",
+            AggregationType::Min => "min",
+            AggregationType::Max => "max",
+            AggregationType::Count => "count",
         };
         write!(f, "{}", outstring)
     }
@@ -167,31 +167,31 @@ pub fn sql_builder(query: Query, data_model: &SemanticModel) -> Result<String, J
         }
     });
 
-    let from_stmt = match generate_from_stmt(tables, &data_model) {
+    let from_stmt = match generate_from_stmt(tables, data_model) {
         Ok(from_stmt) => from_stmt,
         Err(e) => return Err(e),
     };
 
     let mut select_stmt: String = String::from("SELECT ");
     select_stmt.push_str(labels.join(",\n\t").as_str());
-    if labels.len() > 0 {
+    if !labels.is_empty() {
         select_stmt.push_str(",\n\t")
     }
     select_stmt.push_str(aggregations.join(",").as_str());
 
     let mut group_by_stmt: String = String::from("");
-    if aggregations.len() > 0 {
+    if !aggregations.is_empty() {
         group_by_stmt.push_str("GROUP BY ");
         group_by_stmt.push_str(labels.join(",\n\t").as_str());
     }
 
     let mut where_stmt: String = String::from("");
-    if filters.len() > 0 {
+    if !filters.is_empty() {
         let first_filter = filters.first().unwrap().to_string();
         where_stmt.push_str(format!("WHERE {}\n", first_filter).as_str());
 
         for filter in filters.iter().skip(1) {
-            where_stmt.push_str(format!("\tAND {}\n", filter.to_string()).as_str());
+            where_stmt.push_str(format!("\tAND {}\n", filter).as_str());
         }
     }
     let query_str = format!(
@@ -206,7 +206,7 @@ fn generate_from_stmt(
     tables: Vec<String>,
     data_model: &SemanticModel,
 ) -> Result<String, JoinError> {
-    assert!(tables.len() > 0, "There must be atleast one table");
+    assert!(!tables.is_empty(), "There must be atleast one table");
 
     let mut from_statement = String::new();
     let mut previous_tables = vec![tables.first().unwrap()];

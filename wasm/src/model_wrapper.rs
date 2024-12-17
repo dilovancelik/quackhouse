@@ -33,11 +33,11 @@ impl SemanticModelHandle {
     ) -> Result<String, JsError> {
         let mut model = self.model.borrow_mut();
 
-        let columns: Vec<Column>;
-        match serde_json::from_str::<Vec<Column>>(&jsoncolumns) {
-            Ok(cols) => columns = cols,
+        
+        let columns: Vec<Column> = match serde_json::from_str::<Vec<Column>>(&jsoncolumns) {
+            Ok(cols) => cols,
             Err(e) => return Err(JsError::new(&e.to_string())),
-        }
+        };
 
         let relationships = HashMap::new();
         let table = Table {
@@ -79,7 +79,7 @@ impl SemanticModelHandle {
                 "Relationship between {} and {} successfully created",
                 from_table, to_table
             )),
-            Err(e) => return Err(JsError::new(&e)),
+            Err(e) => Err(JsError::new(&e)),
         }
     }
 
@@ -96,7 +96,7 @@ impl SemanticModelHandle {
                 "Relationship between {} and {} successfully deleted",
                 from_table, to_table
             )),
-            Err(e) => return Err(JsError::new(&e)),
+            Err(e) => Err(JsError::new(&e)),
         }
     }
 
@@ -105,7 +105,7 @@ impl SemanticModelHandle {
         let model = self.model.borrow();
 
         match model.parse_json_query(query) {
-            Ok(query) => return Ok(query),
+            Ok(query) => Ok(query),
             Err(e) => return Err(JsError::new(e.to_string().as_str())),
         }
     }

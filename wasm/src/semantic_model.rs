@@ -122,8 +122,8 @@ impl SemanticModel {
 
     pub fn parse_json_query(&self, query: Query) -> Result<String, String> {
         match sql_builder(query, self) {
-            Ok(query) => return Ok(query),
-            Err(e) => return Err(e.to_string()),
+            Ok(query) => Ok(query),
+            Err(e) => Err(e.to_string()),
         }
     }
 }

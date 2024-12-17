@@ -41,5 +41,5 @@ pub fn sql_parser_autocomplete(query: String, tables: Vec<String>, cursor_loc: u
         }
     }
 
-    return result_query;
+    result_query
 }
