@@ -1,4 +1,4 @@
-use crate::data_model::{Column, Database};
+use crate::semantic_model::{Column, SemanticModel};
 use serde::{Deserialize, Serialize};
 use std::{fmt, str::FromStr};
 use wasm_bindgen::{prelude::wasm_bindgen, JsError};
@@ -155,7 +155,7 @@ pub fn parse_json_query(json_query: String, json_data_model: String) -> Result<S
     }
 }
 
-fn sql_builder(query: Query, data_model: Database) -> Result<String, JoinError> {
+fn sql_builder(query: Query, data_model: SemanticModel) -> Result<String, JoinError> {
     let mut tables: Vec<String> = Vec::new();
     let mut aggregations: Vec<String> = Vec::new();
     let mut labels: Vec<String> = Vec::new();
@@ -220,7 +220,10 @@ fn sql_builder(query: Query, data_model: Database) -> Result<String, JoinError> 
     Ok(query_str)
 }
 
-fn generate_from_stmt(tables: Vec<String>, data_model: &Database) -> Result<String, JoinError> {
+fn generate_from_stmt(
+    tables: Vec<String>,
+    data_model: &SemanticModel,
+) -> Result<String, JoinError> {
     assert!(tables.len() > 0, "There must be atleast one table");
 
     let mut from_statement = String::new();
@@ -266,6 +269,7 @@ fn generate_from_stmt(tables: Vec<String>, data_model: &Database) -> Result<Stri
     Ok(from_statement)
 }
 
+#[derive(Serialize, Deserialize)]
 struct JoinError {
     message: String,
 }

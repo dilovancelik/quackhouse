@@ -4,13 +4,15 @@ import { Grid } from 'gridjs';
 import "gridjs/dist/theme/mermaid.css";
 import type { Table } from 'apache-arrow';
 
-const processInputFiles = async (tables: HTMLElement) => {
+import { Database, init_semantic_model } from './semantic_layer';
+
+const createTablesFromFiles = async (tables: HTMLElement, files: FileList) => {
+    var model = init_semantic_model();
     try {
         const db = await initDB();
-        const files = (<HTMLInputElement>document.getElementById("file")!).files!;
-        [...Array(files?.length).keys()].forEach(async (i: number) => {
+        [...Array(files.length).keys()].forEach(async (i: number) => {
             const file = files[i];
-            let res = await createTable(file, db);
+            let res = await createDuckDBTable(file, db, model);
             tables.appendChild(res);
         });
     } catch (error) {
@@ -18,7 +20,7 @@ const processInputFiles = async (tables: HTMLElement) => {
     }
 };
 
-const createTable = async (file: File, db: AsyncDuckDB): Promise<HTMLElement> => {
+const createDuckDBTable = async (file: File, db: AsyncDuckDB, model: Database): Promise<HTMLElement> => {
     let return_html: HTMLElement;
 
     try {
@@ -43,6 +45,7 @@ const createTable = async (file: File, db: AsyncDuckDB): Promise<HTMLElement> =>
         try {
             await conn.query(create_query);
             const result = await conn.query(`SUMMARIZE ${table_name};`);
+            model.add_table(table_name, result);
             return_html = arrowToHTML(result, table_name);
         } catch (error) {
             return_html = errorToHTML(error as Error);
@@ -106,4 +109,4 @@ const errorToHTML = (error: Error): HTMLElement => {
     return htmlError;
 }
 
-export { processInputFiles };
+export { createTablesFromFiles };

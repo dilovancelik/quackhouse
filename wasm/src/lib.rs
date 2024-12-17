@@ -1,9 +1,11 @@
-mod data_model;
+mod model_wrapper;
 mod query_builder;
+mod semantic_model;
 mod statics;
 
 use core::str;
 use wasm_bindgen::prelude::*;
+use web_sys::*;
 
 #[wasm_bindgen]
 pub fn sql_parser_autocomplete(query: String, tables: Vec<String>, cursor_loc: usize) -> String {

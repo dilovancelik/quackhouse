@@ -1,0 +1,53 @@
+{
+    "name": "Hello World",
+    "tables": {
+        "table_1": {
+            "name": "table_1",
+            "desciption": "This is the first table, it has information",
+            "columns": [
+                {
+                    "table": "table_1",
+                    "column": "id",
+                    "data_type": "BIGINT",
+                    "description": "This a column with ids"
+                },
+                {
+                    "table": "table_1",
+                    "column": "name",
+                    "data_type": "VARCHAR",
+                    "description": "This a column with names"
+                }
+            ],
+            "relationships": {
+                "table_2": {
+                    "from_column": "id",
+                    "to_column": "id"
+                }
+            }
+        },
+        "table_2": {
+            "name": "table_2",
+            "desciption": "This is the first table, it has information",
+            "columns": [
+                {
+                    "table": "table_2",
+                    "column": "id",
+                    "data_type": "BIGINT",
+                    "description": "This a column with ids"
+                },
+                {
+                    "table": "table_2",
+                    "column": "name",
+                    "data_type": "VARCHAR",
+                    "description": "This a column with names"
+                }
+            ],
+            "relationships": {
+                "table_1": {
+                    "from_column": "id",
+                    "to_column": "id"
+                }
+            }
+        }
+    }
+}
