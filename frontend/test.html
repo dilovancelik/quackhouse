@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Table Relationship UI Demo</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: sans-serif;
+            overflow: hidden;
+        }
+
+        #diagram-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            background-color: #eaffea;
+            background-image:
+                linear-gradient(#b5d3b5 1px, transparent 1px),
+                linear-gradient(to right, #b5d3b5 1px, transparent 1px);
+
+            /* Each "cell" is 20x20px, adjust to your preference */
+            background-size: 20px 20px;
+        }
+
+        .table-node {
+            position: absolute;
+            width: 200px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background: #fff;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            font-size: 14px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .table-header {
+            background: #eee;
+            padding: 8px;
+            font-weight: bold;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .columns-container {
+            padding: 4px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .column {
+            padding: 4px;
+            margin: 2px 0;
+            border: 1px solid transparent;
+            background: #fafafa;
+            cursor: grab;
+            user-select: none;
+            border-radius: 4px;
+        }
+
+        .column:hover {
+            background: #eaeaea;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="diagram-container">
+        <svg id="edges-layer" style="position:absolute; top:0; left:0; width:100%; height:100%;"></svg>
+    </div>
+
+    <script>
+        // Example schema
+        var schema = {
+            tables: [
+                {
+                    name: "Customers",
+                    x: 100,
+                    y: 100,
+                    columns: [
+                        { name: "CustomerID", primaryKey: true },
+                        { name: "Name" },
+                        { name: "Email" }
+                    ]
+                },
+                {
+                    name: "Orders",
+                    x: 400,
+                    y: 200,
+                    columns: [
+                        { name: "OrderID", primaryKey: true },
+                        { name: "CustomerID", foreignKey: "Customers.CustomerID" },
+                        { name: "Total" }
+                    ]
+                }
+            ]
+        };
+
+        var container = document.getElementById('diagram-container');
+        var edgesLayer = document.getElementById('edges-layer');
+
+        function renderTables() {
+            // Clear existing nodes
+            Array.from(container.querySelectorAll('.table-node')).forEach(function (n) { n.remove(); });
+
+            schema.tables.forEach(function (table) {
+                var nodeDiv = document.createElement('div');
+                nodeDiv.className = 'table-node';
+                nodeDiv.style.left = table.x + 'px';
+                nodeDiv.style.top = table.y + 'px';
+
+                var headerDiv = document.createElement('div');
+                headerDiv.className = 'table-header';
+                headerDiv.innerText = table.name;
+
+                var columnsContainer = document.createElement('div');
+                columnsContainer.className = 'columns-container';
+
+                table.columns.forEach(function (col) {
+                    var colDiv = document.createElement('div');
+                    colDiv.className = 'column';
+                    colDiv.innerText = col.name;
+                    colDiv.draggable = true;
+
+                    colDiv.addEventListener('dragstart', function (e) {
+                        e.dataTransfer.setData('sourceTable', table.name);
+                        e.dataTransfer.setData('sourceColumn', col.name);
+                        console.log('Dragging column:', table.name + '.' + col.name);
+                    });
+
+                    columnsContainer.appendChild(colDiv);
+                });
+
+                nodeDiv.appendChild(headerDiv);
+                nodeDiv.appendChild(columnsContainer);
+                container.appendChild(nodeDiv);
+            });
+        }
+
+        function drawEdges() {
+            while (edgesLayer.firstChild) {
+                edgesLayer.removeChild(edgesLayer.firstChild);
+            }
+
+            // Draw edges for foreign keys
+            schema.tables.forEach(function (sourceTable) {
+                sourceTable.columns.forEach(function (col) {
+                    if (col.foreignKey) {
+                        var parts = col.foreignKey.split('.');
+                        var targetTableName = parts[0];
+                        // var targetColName = parts[1]; // Not needed for visualization
+
+                        var targetTable = schema.tables.find(function (t) { return t.name === targetTableName; });
+                        if (targetTable) {
+                            var x1 = sourceTable.x + 200; // right edge of source table
+                            var y1 = sourceTable.y + 40;  // some offset below header
+                            var x2 = targetTable.x;       // left edge of target table
+                            var y2 = targetTable.y + 40;
+
+                            var line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                            line.setAttribute('x1', x1.toString());
+                            line.setAttribute('y1', y1.toString());
+                            line.setAttribute('x2', x2.toString());
+                            line.setAttribute('y2', y2.toString());
+                            line.setAttribute('stroke', '#999');
+                            line.setAttribute('stroke-width', '2');
+                            line.setAttribute('marker-end', 'url(#arrow)');
+
+                            edgesLayer.appendChild(line);
+                        }
+                    }
+                });
+            });
+
+            // Add arrow marker if not present
+            var arrowMarker = edgesLayer.querySelector('marker#arrow');
+            if (!arrowMarker) {
+                arrowMarker = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
+                arrowMarker.setAttribute('id', 'arrow');
+                arrowMarker.setAttribute('viewBox', '0 0 10 10');
+                arrowMarker.setAttribute('refX', '10');
+                arrowMarker.setAttribute('refY', '5');
+                arrowMarker.setAttribute('markerWidth', '6');
+                arrowMarker.setAttribute('markerHeight', '6');
+                arrowMarker.setAttribute('orient', 'auto-start-reverse');
+
+                var path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                path.setAttribute('d', 'M0,0 L10,5 L0,10 z');
+                path.setAttribute('fill', '#999');
+                arrowMarker.appendChild(path);
+                edgesLayer.appendChild(arrowMarker);
+            }
+        }
+
+        // Handle drag and drop globally
+        document.addEventListener('dragover', function (e) {
+            e.preventDefault(); // Allow drop
+        });
+
+        document.addEventListener('drop', function (e) {
+            var sourceTable = e.dataTransfer.getData('sourceTable');
+            var sourceColumn = e.dataTransfer.getData('sourceColumn');
+
+            if (sourceTable && sourceColumn) {
+                var targetEl = e.target;
+                if (targetEl && targetEl.classList.contains('column')) {
+                    var targetTableNode = targetEl.closest('.table-node');
+                    if (targetTableNode) {
+                        var targetTableName = targetTableNode.querySelector('.table-header').innerText;
+                        var targetColumnName = targetEl.innerText;
+                        console.log('Dropped ' + sourceTable + '.' + sourceColumn + ' onto ' + targetTableName + '.' + targetColumnName);
+                        // Implement your logic to update the relationship here.
+                    }
+                }
+            }
+        });
+
+        // Initial render
+        renderTables();
+        drawEdges();
+    </script>
+</body>
+
+</html>

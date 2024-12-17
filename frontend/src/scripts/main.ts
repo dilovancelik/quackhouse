@@ -2,6 +2,7 @@
 import '../styles/style.css';
 
 import { createTablesFromFiles } from './duckdb_wrapper';
+import { initModel } from './semantic_layer';
 
 const processInputFiles = () => {
   const tables = document.getElementById("tables")!;
@@ -10,9 +11,16 @@ const processInputFiles = () => {
 }
 
 document.getElementById("import_data_button")?.addEventListener("click", () => {
-  document.getElementById("file")?.click();
+  console.log("click");
+  document.getElementById("files")?.click();
 });
 
-document.getElementById("file")?.addEventListener("change", () => {
+document.getElementById("files")?.addEventListener("change", () => {
   processInputFiles()
 });
+
+document.getElementById("log_model")?.addEventListener("click", () => {
+  const model = initModel(null);
+  const string_model = model.download_model();
+  console.log(string_model);
+})

@@ -1,7 +1,7 @@
 use crate::semantic_model::{Column, SemanticModel};
 use serde::{Deserialize, Serialize};
 use std::{fmt, str::FromStr};
-use wasm_bindgen::{prelude::wasm_bindgen, JsError};
+use wasm_bindgen::prelude::*;
 
 #[derive(Serialize, Deserialize)]
 struct Aggregation {
@@ -129,7 +129,7 @@ impl fmt::Display for AggregationType {
         write!(f, "{}", outstring)
     }
 }
-
+#[wasm_bindgen]
 #[derive(Serialize, Deserialize)]
 pub struct Query {
     labels: Vec<Column>,
@@ -137,25 +137,7 @@ pub struct Query {
     filters: Vec<Filter>,
 }
 
-#[wasm_bindgen]
-pub fn parse_json_query(json_query: String, json_data_model: String) -> Result<String, JsError> {
-    let query_obj = match serde_json::from_str(json_query.as_str()) {
-        Ok(query) => query,
-        Err(e) => return Err(JsError::new(e.to_string().as_str())),
-    };
-
-    let model = match serde_json::from_str(json_data_model.as_str()) {
-        Ok(model) => model,
-        Err(e) => return Err(JsError::new(e.to_string().as_str())),
-    };
-
-    match sql_builder(query_obj, model) {
-        Ok(query) => return Ok(query),
-        Err(e) => return Err(JsError::new(e.to_string().as_str())),
-    }
-}
-
-fn sql_builder(query: Query, data_model: SemanticModel) -> Result<String, JoinError> {
+pub fn sql_builder(query: Query, data_model: &SemanticModel) -> Result<String, JoinError> {
     let mut tables: Vec<String> = Vec::new();
     let mut aggregations: Vec<String> = Vec::new();
     let mut labels: Vec<String> = Vec::new();
@@ -270,7 +252,7 @@ fn generate_from_stmt(
 }
 
 #[derive(Serialize, Deserialize)]
-struct JoinError {
+pub struct JoinError {
     message: String,
 }
 

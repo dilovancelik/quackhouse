@@ -4,10 +4,11 @@ import { Grid } from 'gridjs';
 import "gridjs/dist/theme/mermaid.css";
 import type { Table } from 'apache-arrow';
 
-import { Database, init_semantic_model } from './semantic_layer';
+import { initModel } from './semantic_layer';
+import { Query, SemanticModelHandle } from '../../public/wasm/wasm';
 
 const createTablesFromFiles = async (tables: HTMLElement, files: FileList) => {
-    var model = init_semantic_model();
+    var model = initModel(null);
     try {
         const db = await initDB();
         [...Array(files.length).keys()].forEach(async (i: number) => {
@@ -20,7 +21,7 @@ const createTablesFromFiles = async (tables: HTMLElement, files: FileList) => {
     }
 };
 
-const createDuckDBTable = async (file: File, db: AsyncDuckDB, model: Database): Promise<HTMLElement> => {
+const createDuckDBTable = async (file: File, db: AsyncDuckDB, model: SemanticModelHandle): Promise<HTMLElement> => {
     let return_html: HTMLElement;
 
     try {
@@ -45,7 +46,20 @@ const createDuckDBTable = async (file: File, db: AsyncDuckDB, model: Database): 
         try {
             await conn.query(create_query);
             const result = await conn.query(`SUMMARIZE ${table_name};`);
-            model.add_table(table_name, result);
+            const columns = JSON.stringify(
+                result
+                    .toArray()
+                    .map((col) => {
+                        return {
+                            table: table_name,
+                            column: col["column_name"],
+                            data_type: col["column_type"],
+                            description: col["column_name"]
+                        }
+                    })
+            );
+            console.log(columns);
+            model.add_table(table_name, columns);
             return_html = arrowToHTML(result, table_name);
         } catch (error) {
             return_html = errorToHTML(error as Error);
@@ -60,6 +74,24 @@ const createDuckDBTable = async (file: File, db: AsyncDuckDB, model: Database): 
     return return_html;
 }
 
+
+const executeQuery = async (query: Query): HTMLElement => {
+    let db = await initDB();
+    let model = initModel(null);
+    const duckdb_query = model.parse_json_query(query);
+
+    let result_html: HTMLElement;
+    await db.connect()
+        .then((conn) => {
+            conn.query(duckdb_query)
+                .then((result) => { result_html = arrowToHTML(result, "Result") })
+                .catch((error) => { result_html = errorToHTML(error) })
+                .finally(() => { conn.close() })
+        })
+        .catch((error) => { result_html = errorToHTML(error) });
+
+    return result_html;
+}
 
 const arrowToHTML = (result: Table<any>, table_name: string): HTMLElement => {
     const data = JSON.parse(result.toString());

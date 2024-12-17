@@ -14,9 +14,23 @@
     <div class="database_explorer">
       <div id="tables"></div>
       <button type="button" id="import_data_button">Import Data</button>
-      <input type="files" name="files" id="files" accept=".json, .csv, .parquet" style="display: none;" multiple />
+      <input type="file" name="files" id="files" accept=".json, .csv, .parquet" style="display: none;" multiple />
+    </div>
+    <button type="button" id="log_model">Print Model</button>
+  </div>
+  <div id="diagram-container" style="position:relative; width:100%; height:100%;">
+    <svg id="edges-layer" style="position:absolute; top:0; left:0; width:100%; height:100%;"></svg>
+    <div class="table-node" style="position:absolute; left:100px; top:200px; width:200px;">
+      <div class="table-header">Customers</div>
+      <div class="columns-container" style="max-height:100px; overflow:auto;">
+        <div class="column" draggable="true" data-column-name="CustomerID">CustomerID</div>
+        <div class="column" draggable="true" data-column-name="Name">Name</div>
+      </div>
     </div>
   </div>
+
+
+
 
   <script type="module" src="/src/scripts/main.ts"></script>
 

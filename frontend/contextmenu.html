@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Custom Right Click Menu</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: sans-serif;
+        }
+
+        #custom-menu {
+            position: absolute;
+            display: none;
+            background: #fff;
+            border: 1px solid #ccc;
+            min-width: 150px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            z-index: 9999;
+        }
+
+        #custom-menu ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        #custom-menu li {
+            padding: 8px;
+            cursor: pointer;
+        }
+
+        #custom-menu li:hover {
+            background: #eee;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div style="height:100vh; background:#f9f9f9;">
+        Right-click anywhere in this area to see the custom menu.
+    </div>
+
+    <div id="custom-menu">
+        <ul>
+            <li id="option-1">Option 1</li>
+            <li id="option-2">Option 2</li>
+            <li id="option-3">Option 3</li>
+        </ul>
+    </div>
+
+    <script>
+        const customMenu = document.getElementById('custom-menu');
+
+        // Show custom menu on right-click
+        document.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            const x = e.clientX;
+            const y = e.clientY;
+            customMenu.style.top = `${y}px`;
+            customMenu.style.left = `${x}px`;
+            customMenu.style.display = 'block';
+        });
+
+        // Hide the menu on left click
+        document.addEventListener('click', () => {
+            customMenu.style.display = 'none';
+        });
+
+        // Add handlers for your menu items
+        document.getElementById('option-1').addEventListener('click', () => {
+            alert('Option 1 clicked!');
+        });
+
+        document.getElementById('option-2').addEventListener('click', () => {
+            alert('Option 2 clicked!');
+        });
+
+        document.getElementById('option-3').addEventListener('click', () => {
+            alert('Option 3 clicked!');
+        });
+    </script>
+
+</body>
+
+</html>
