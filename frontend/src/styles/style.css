@@ -21,6 +21,7 @@ a {
 
 a:hover {
   color: #535bf2;
+  text-decoration: underline;
 }
 
 body {
@@ -69,7 +70,7 @@ body {
   border: 1px solid;
   border-radius: 10px;
   background-color: #444;
-  margin: 10px;
+  margin-right: 1px;
   width: fit-content;
 }
 
@@ -202,11 +203,11 @@ button:focus-visible {
   display: flex;
   justify-content: right;
   padding: 10px;
-  overflow: unset;
+  max-height: 40px;
 }
 
-.navigation_row button {
-  text-wrap-mode: nowrap;
+.navigation_row a {
+  margin-left: 20px;
 }
 
 .datamodel {
@@ -288,6 +289,13 @@ button:focus-visible {
     display: flex;
   }
 
+  .modal_content input {
+    background-color: #f9f9f9;
+  }
+
+  .card {
+    background-color: #f9f9f9;
+  }
 }
 
 .progress_bar {
@@ -296,4 +304,13 @@ button:focus-visible {
 
 .progress_bar progress {
   margin-right: 15px;
+}
+
+.about {
+  display: none;
+  grid-row: 3/4;
+  grid-column: 1/5;
+  width: 90vw;
+  height: 80vh;
+  margin-bottom: 5%;
 }

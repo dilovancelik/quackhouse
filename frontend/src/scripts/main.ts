@@ -24,8 +24,18 @@ document.getElementById("log_model")?.addEventListener("click", () => {
   console.log(string_model);
 })
 
+document.addEventListener("click", (e: Event) => {
+  // Event listener to close any open modal, if mouse click
+  // happens outside modal
+  const target_element = (<HTMLElement>e.target!);
+  if (target_element.classList.contains("modal")) {
+    target_element.style.display = "none";
+  }
+})
+
 document.getElementById("open_import")?.addEventListener("click", () => {
   document.getElementById("create_table_modal")!.style.display = "block";
+  document.getElementById("progress_bar")!.style.display = "none"
 })
 
 document.getElementById("close_table")?.addEventListener("click", () => {
@@ -64,12 +74,22 @@ document.getElementById("progress_bar")?.addEventListener("table_creation_finish
   (<HTMLProgressElement>document.getElementById("table_creation_bar")!).value = Math.max((loaded_files / total_files), 0.05);
   document.getElementById("table_creation_text")!.innerText = `Created ${total_files} tables`;
 
-
   document.getElementById("create_table_modal")!.style.display = "none";
-
 })
 
 document.getElementById("auto_rel")?.addEventListener("click", () => {
   const model = initModel(null);
   autodetect_relationships(model);
+})
+
+document.getElementById("about_button")?.addEventListener("click", () => {
+  document.getElementById("about")!.style.display = "block";
+  document.getElementById("datamodel")!.style.display = "none";
+
+})
+
+
+document.getElementById("datamodel_button")?.addEventListener("click", () => {
+  document.getElementById("about")!.style.display = "none";
+  document.getElementById("datamodel")!.style.display = "block";
 })
