@@ -25,22 +25,17 @@ a:hover {
 
 body {
   margin: 0;
-  display: flex;
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
-
 #app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+  width: 90%;
+  margin-left: 5%;
+  margin-right: 5%;
 }
 
 .logo {
@@ -58,8 +53,24 @@ h1 {
   filter: drop-shadow(0 0 2em #3178c6aa);
 }
 
+.modal_content input {
+  padding: 5px;
+  border: 1px solid;
+  border-radius: 10px;
+  background-color: #444;
+  margin: 10px;
+  width: fit-content;
+  height: 50px;
+  font-size: medium;
+}
+
 .card {
-  padding: 2em;
+  padding: 5px;
+  border: 1px solid;
+  border-radius: 10px;
+  background-color: #444;
+  margin: 10px;
+  width: fit-content;
 }
 
 .read-the-docs {
@@ -70,11 +81,13 @@ button {
   border-radius: 8px;
   border: 1px solid transparent;
   padding: 0.6em 1.2em;
+  margin-left: 10px;
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
   background-color: #1a1a1a;
   cursor: pointer;
+  height: auto;
   transition: border-color 0.25s;
 }
 
@@ -98,10 +111,189 @@ button:focus-visible {
   }
 
   button {
-    background-color: #f9f9f9;
+    background-color: #F8F8F8;
   }
 }
 
 .error {
   background-color: #ffb3b3;
+}
+
+.datamodel {
+  border-radius: 30px;
+  width: 90vw;
+  height: 80vh;
+  align-items: center;
+  overflow: hidden;
+  display: inline-flex;
+  box-shadow: 0px 4px 6px rgba(255, 255, 255, 0.1),
+    0px 1px 3px rgba(255, 255, 255, 0.06),
+    0 0 10px rgba(255, 255, 255, 0.1);
+}
+
+.datamodel:hover {
+  border: 1px solid #646cff;
+}
+
+.datamodel-visualiser {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  /*
+ */
+  background-color: #1e1e1e;
+  /* Dark background */
+  background-image:
+    linear-gradient(#444 1px, transparent 1px),
+    /* Lines in dark gray */
+    linear-gradient(to right, #444 1px, transparent 1px);
+
+  /* Each "cell" is 20x20px, adjust to your preference */
+  background-size: 20px 20px;
+}
+
+
+.datamodel_buttons {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 10;
+  /* Ensures the buttons are on top of Cytoscape */
+  gap: 10px;
+}
+
+.datamodel_buttons button {
+  box-shadow: 0px 4px 6px rgba(255, 255, 255, 0.1),
+    0px 1px 3px rgba(255, 255, 255, 0.06),
+    0 0 10px rgba(255, 255, 255, 0.1);
+  /* Subtle floating effect */
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+@media (prefers-color-scheme: light) {
+
+  .datamodel {
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .datamodel-visualiser {
+    background-color: #fff;
+    background-image:
+      linear-gradient(#E6E6E6 1px, transparent 1px),
+      linear-gradient(to right, #E6E6E6 1px, transparent 1px);
+  }
+
+  .datamodel_buttons button {
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.header {
+
+  grid-row: 1 / 2;
+  grid-column: 1 / 5;
+  display: flex;
+  justify-content: center;
+}
+
+.navigation_row {
+  grid-row: 2 / 3;
+  grid-column: 3 / 5;
+  display: flex;
+  justify-content: right;
+  padding: 10px;
+  overflow: unset;
+}
+
+.navigation_row button {
+  text-wrap-mode: nowrap;
+}
+
+.datamodel {
+  grid-row: 3 / 4;
+  grid-column: 1 / 5;
+  overflow: wrap;
+  margin-bottom: 5%;
+}
+
+/* Modal background overlay */
+.modal {
+  display: none;
+  /* Hidden by default */
+  position: fixed;
+  z-index: 10;
+  /* Above other elements */
+  left: 0;
+  top: 0;
+  width: 100%;
+  /* Full width */
+  height: 100%;
+  /* Full height */
+  background-color: rgba(255, 255, 255, 0.5);
+  /* Black with opacity */
+}
+
+/* Modal content */
+.modal_content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  /* Center the modal */
+  background-color: #242424;
+  padding: 20px;
+  border-radius: 8px;
+  max-width: 80%;
+}
+
+/* Close button */
+.close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 20px;
+  cursor: pointer;
+  color: #aaa;
+}
+
+.close:hover {
+  color: #000;
+}
+
+.modal_content button {
+  background-color: #444;
+}
+
+@media (prefers-color-scheme: light) {
+
+  .modal {
+    /* Full height */
+    background-color: rgba(0, 0, 0, 0.5);
+    /* Black with opacity */
+  }
+
+  .modal_content button {
+    background-color: #f9f9f9;
+  }
+
+  /* Modal content */
+  .modal_content {
+    /* Center the modal */
+    background-color: #fff;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+  }
+
+  .modal_buttons {
+    justify-content: right;
+    display: flex;
+  }
+
+}
+
+.progress_bar {
+  display: none;
+}
+
+.progress_bar progress {
+  margin-right: 15px;
 }

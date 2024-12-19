@@ -15,5 +15,9 @@ const initModel = (name: string | null) => {
     return model;
 }
 
+const autodetect_relationships = (model: SemanticModelHandle) => {
+    let potential_relationships = JSON.parse(model.auto_detect_relationships());
+    console.log(potential_relationships);
+}
 
-export { initModel }
+export { initModel, autodetect_relationships }

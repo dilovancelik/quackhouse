@@ -14,6 +14,11 @@ export class SemanticModelHandle {
   delete_relationship(from_table: string, to_table: string): string;
   parse_json_query(query: Query): string;
   download_model(): string;
+  get_cytoscape_elements(): string;
+  set_name(name: string): void;
+  get_name(): string;
+  auto_detect_relationships(): string;
+  get_columns(table_name: string): (string)[];
 }
 
 export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembly.Module;
@@ -21,7 +26,6 @@ export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembl
 export interface InitOutput {
   readonly memory: WebAssembly.Memory;
   readonly __wbg_query_free: (a: number, b: number) => void;
-  readonly sql_parser_autocomplete: (a: number, b: number, c: number, d: number, e: number) => [number, number];
   readonly __wbg_semanticmodelhandle_free: (a: number, b: number) => void;
   readonly semanticmodelhandle_new: (a: number, b: number) => number;
   readonly semanticmodelhandle_add_table: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => [number, number, number, number];
@@ -30,12 +34,19 @@ export interface InitOutput {
   readonly semanticmodelhandle_delete_relationship: (a: number, b: number, c: number, d: number, e: number) => [number, number, number, number];
   readonly semanticmodelhandle_parse_json_query: (a: number, b: number) => [number, number, number, number];
   readonly semanticmodelhandle_download_model: (a: number) => [number, number, number, number];
+  readonly semanticmodelhandle_get_cytoscape_elements: (a: number) => [number, number, number, number];
+  readonly semanticmodelhandle_set_name: (a: number, b: number, c: number) => void;
+  readonly semanticmodelhandle_get_name: (a: number) => [number, number];
+  readonly semanticmodelhandle_auto_detect_relationships: (a: number) => [number, number, number, number];
+  readonly semanticmodelhandle_get_columns: (a: number, b: number, c: number) => [number, number, number, number];
+  readonly sql_parser_autocomplete: (a: number, b: number, c: number, d: number, e: number) => [number, number];
   readonly __wbindgen_export_0: WebAssembly.Table;
   readonly __wbindgen_malloc: (a: number, b: number) => number;
   readonly __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;
-  readonly __externref_table_alloc: () => number;
-  readonly __wbindgen_free: (a: number, b: number, c: number) => void;
   readonly __externref_table_dealloc: (a: number) => void;
+  readonly __wbindgen_free: (a: number, b: number, c: number) => void;
+  readonly __externref_table_alloc: () => number;
+  readonly __externref_drop_slice: (a: number, b: number) => void;
   readonly __wbindgen_start: () => void;
 }
 

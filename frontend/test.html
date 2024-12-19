@@ -8,67 +8,176 @@
     <style>
         body {
             margin: 0;
-            font-family: sans-serif;
+            font-family: 'Roboto', sans-serif;
+            /* Clean and modern font */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #f8f9fa;
+            /* Light neutral */
+            height: 100vh;
             overflow: hidden;
+        }
+
+        #app-container {
+            position: relative;
+            width: 90vw;
+            height: 90vh;
+            background: #ffffff;
+            /* Clean white background */
+            border-radius: 30px;
+            border: 1px solid green;
+            /* Subtle grey border */
+            overflow: hidden;
+            display: flex;
+            flex-direction: row;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            /* Subtle shadow for depth */
         }
 
         #diagram-container {
             position: relative;
-            width: 100vw;
-            height: 100vh;
+            flex: 1;
             background-color: #eaffea;
             background-image:
                 linear-gradient(#b5d3b5 1px, transparent 1px),
                 linear-gradient(to right, #b5d3b5 1px, transparent 1px);
-
-            /* Each "cell" is 20x20px, adjust to your preference */
+            /* Light gridlines */
             background-size: 20px 20px;
+            overflow: hidden;
+        }
+
+        #edges-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
         }
 
         .table-node {
             position: absolute;
             width: 200px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            background: #fff;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            border: 1px solid #E0FFD2;
+            /* Light grey border */
+            border-radius: 8px;
+            /* Slightly rounded corners for a modern feel */
+            background: #F9FFF7;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+            /* Soft shadow */
             font-size: 14px;
             display: flex;
             flex-direction: column;
+            user-select: none;
         }
 
         .table-header {
-            background: #eee;
+            background: darkgreen;
+            /* Modern blue */
+            color: #ffffff;
+            /* White text */
             padding: 8px;
             font-weight: bold;
-            border-bottom: 1px solid #ccc;
+            border-bottom: 1px solid #d1d5db;
+            /* Subtle border for separation */
+            cursor: move;
+            user-select: none;
+            border-radius: 8px 8px 0 0;
+            /* Rounded top corners */
         }
 
         .columns-container {
             padding: 4px;
             overflow-y: auto;
             flex: 1;
+
         }
 
         .column {
-            padding: 4px;
-            margin: 2px 0;
-            border: 1px solid transparent;
-            background: #fafafa;
+            padding: 6px;
+            margin: 4px 0;
+            border: 1px solid #D0FFBC;
+            /* Light grey for subtle border */
+            background: #EAFFE1;
+            /* Very light grey */
             cursor: grab;
             user-select: none;
-            border-radius: 4px;
+            border-radius: 6px;
+            transition: background 0.2s ease;
         }
 
         .column:hover {
-            background: #eaeaea;
+            background: #D0FFBC;
+            /* Slightly darker grey on hover */
+        }
+
+        /* Navigation sidebar */
+        #nav-container {
+            padding-top: 10px;
+            width: 300px;
+            border-left: 1px solid #d1d5db;
+            align-items: center;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            background: #ccffcc;
+        }
+
+        .nav-table {
+            width: 90%;
+            /* Divider between tables */
+            margin: 0;
+            padding: 0;
+
+        }
+
+        .nav-table-header {
+            margin-top: 5px;
+            padding: 8px;
+            background: darkgreen;
+            /* Modern blue */
+            color: #ffffff;
+            cursor: pointer;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            user-select: none;
+            transition: background 0.2s ease;
+        }
+
+        .nav-table-header:after {
+            content: '+';
+            font-size: 14px;
+        }
+
+        .nav-table-header.expanded:after {
+            content: '-';
+        }
+
+        .nav-columns {
+            padding: 4px;
+            display: none;
+            background: #EFFFE8;
+            /* Light grey for collapsed columns */
+        }
+
+        .nav-column {
+            margin: 4px 0;
+            font-size: 14px;
+            color: #374151;
+            /* Neutral dark grey text */
         }
     </style>
+
 </head>
 
 <body>
-    <div id="diagram-container">
-        <svg id="edges-layer" style="position:absolute; top:0; left:0; width:100%; height:100%;"></svg>
+    <div id="app-container">
+        <div id="diagram-container">
+            <svg id="edges-layer"></svg>
+        </div>
+        <div id="nav-container"></div>
     </div>
 
     <script>
@@ -100,6 +209,11 @@
 
         var container = document.getElementById('diagram-container');
         var edgesLayer = document.getElementById('edges-layer');
+        var navContainer = document.getElementById('nav-container');
+
+        var currentDragTable = null;
+        var dragOffsetX = 0;
+        var dragOffsetY = 0;
 
         function renderTables() {
             // Clear existing nodes
@@ -114,6 +228,17 @@
                 var headerDiv = document.createElement('div');
                 headerDiv.className = 'table-header';
                 headerDiv.innerText = table.name;
+
+                // Make the table draggable by its header
+                headerDiv.addEventListener('mousedown', function (e) {
+                    currentDragTable = { table: table, node: nodeDiv };
+                    var rect = nodeDiv.getBoundingClientRect();
+                    // offset from mouse to top-left of the node
+                    dragOffsetX = e.clientX - rect.left;
+                    dragOffsetY = e.clientY - rect.top;
+                    document.addEventListener('mousemove', onMouseMove);
+                    document.addEventListener('mouseup', onMouseUp);
+                });
 
                 var columnsContainer = document.createElement('div');
                 columnsContainer.className = 'columns-container';
@@ -139,6 +264,36 @@
             });
         }
 
+        function onMouseMove(e) {
+            if (currentDragTable) {
+                var table = currentDragTable.table;
+                var nodeDiv = currentDragTable.node;
+                var rectParent = container.getBoundingClientRect();
+
+                // Compute new position relative to diagram container
+                var newLeft = e.clientX - rectParent.left - dragOffsetX;
+                var newTop = e.clientY - rectParent.top - dragOffsetY;
+
+                // Update table position in schema
+                table.x = newLeft;
+                table.y = newTop;
+
+                // Update node position
+                nodeDiv.style.left = table.x + 'px';
+                nodeDiv.style.top = table.y + 'px';
+            }
+        }
+
+        function onMouseUp(e) {
+            if (currentDragTable) {
+                currentDragTable = null;
+                document.removeEventListener('mousemove', onMouseMove);
+                document.removeEventListener('mouseup', onMouseUp);
+                // Re-draw the edges after dropping the table
+                drawEdges();
+            }
+        }
+
         function drawEdges() {
             while (edgesLayer.firstChild) {
                 edgesLayer.removeChild(edgesLayer.firstChild);
@@ -150,7 +305,6 @@
                     if (col.foreignKey) {
                         var parts = col.foreignKey.split('.');
                         var targetTableName = parts[0];
-                        // var targetColName = parts[1]; // Not needed for visualization
 
                         var targetTable = schema.tables.find(function (t) { return t.name === targetTableName; });
                         if (targetTable) {
@@ -194,7 +348,45 @@
             }
         }
 
-        // Handle drag and drop globally
+        function renderNav() {
+            navContainer.innerHTML = ''; // Clear existing
+
+            schema.tables.forEach(function (table) {
+                var navTableDiv = document.createElement('div');
+                navTableDiv.className = 'nav-table';
+
+                var navTableHeader = document.createElement('div');
+                navTableHeader.className = 'nav-table-header';
+                navTableHeader.innerText = table.name;
+
+                var navColumnsDiv = document.createElement('div');
+                navColumnsDiv.className = 'nav-columns';
+
+                table.columns.forEach(function (col) {
+                    var navColDiv = document.createElement('div');
+                    navColDiv.className = 'nav-column';
+                    navColDiv.innerText = col.name;
+                    navColumnsDiv.appendChild(navColDiv);
+                });
+
+                // Toggle handler
+                navTableHeader.addEventListener('click', function () {
+                    if (navTableHeader.classList.contains('expanded')) {
+                        navColumnsDiv.style.display = 'none';
+                        navTableHeader.classList.remove('expanded');
+                    } else {
+                        navColumnsDiv.style.display = 'block';
+                        navTableHeader.classList.add('expanded');
+                    }
+                });
+
+                navTableDiv.appendChild(navTableHeader);
+                navTableDiv.appendChild(navColumnsDiv);
+                navContainer.appendChild(navTableDiv);
+            });
+        }
+
+        // Handle drag and drop globally for columns
         document.addEventListener('dragover', function (e) {
             e.preventDefault(); // Allow drop
         });
@@ -220,6 +412,7 @@
         // Initial render
         renderTables();
         drawEdges();
+        renderNav();
     </script>
 </body>
 

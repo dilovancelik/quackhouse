@@ -1,33 +1,57 @@
 import { initDB } from './duckdb';
 import { AsyncDuckDB } from '@duckdb/duckdb-wasm';
 import { Grid } from 'gridjs';
-import "gridjs/dist/theme/mermaid.css";
+
+import { ApexGrid } from 'apex-grid';
+ApexGrid.register();
+
 import type { Table } from 'apache-arrow';
 
 import { initModel } from './semantic_layer';
-import { Query, SemanticModelHandle } from '../../public/wasm/wasm';
 
-const createTablesFromFiles = async (tables: HTMLElement, files: FileList) => {
+import { /*Query,*/ SemanticModelHandle } from '../../public/wasm/wasm';
+import { createMap } from './model_visualiser';
+
+const createTablesFromFiles = async (files: FileList) => {
+    var loaded_files = 0;
+    sessionStorage.setItem("total_files", files.length.toString());
+    sessionStorage.setItem("loaded_files", loaded_files.toString());
+
+    var progress_bar = document.getElementById("progress_bar")!;
+    progress_bar.dispatchEvent(new CustomEvent("progress_bar_display_update", { detail: "flex" }));
+
+    const creation_event = new CustomEvent("table_creation_event");
     var model = initModel(null);
     try {
         const db = await initDB();
         [...Array(files.length).keys()].forEach(async (i: number) => {
             const file = files[i];
             let res = await createDuckDBTable(file, db, model);
-            tables.appendChild(res);
+            loaded_files += 1;
+            sessionStorage.setItem("loaded_files", (loaded_files).toString())
+            sessionStorage.setItem(`table_${res[0]}`, res[1].outerHTML)
+            if (loaded_files === files.length) {
+                progress_bar.dispatchEvent(new CustomEvent("table_creation_finished"));
+                createMap(model);
+            } else {
+                progress_bar.dispatchEvent(creation_event);
+            }
         });
     } catch (error) {
-        tables.appendChild(errorToHTML(error as Error));
+        console.log(errorToHTML(error as Error));
     }
+
 };
 
-const createDuckDBTable = async (file: File, db: AsyncDuckDB, model: SemanticModelHandle): Promise<HTMLElement> => {
+const createDuckDBTable = async (file: File, db: AsyncDuckDB, model: SemanticModelHandle): Promise<[string, HTMLElement]> => {
     let return_html: HTMLElement;
+    let name: string;
 
     try {
         var file_name_array = file.name.split(".");
         const ext: string | undefined = file_name_array.pop();
         const table_name: string | undefined = file_name_array.join("").replaceAll(" ", "_").replaceAll("-", "_");
+        name = table_name;
         const content = await file.arrayBuffer();
 
         await db.registerFileBuffer(`/${file.name}`, new Uint8Array(content))
@@ -58,7 +82,6 @@ const createDuckDBTable = async (file: File, db: AsyncDuckDB, model: SemanticMod
                         }
                     })
             );
-            console.log(columns);
             model.add_table(table_name, columns);
             return_html = arrowToHTML(result, table_name);
         } catch (error) {
@@ -68,13 +91,13 @@ const createDuckDBTable = async (file: File, db: AsyncDuckDB, model: SemanticMod
         }
 
     } catch (error) {
+        name = "Error";
         return_html = errorToHTML(error as Error);
     }
-    console.log(return_html)
-    return return_html;
+    return [name, return_html];
 }
 
-
+/*
 const executeQuery = async (query: Query): HTMLElement => {
     let db = await initDB();
     let model = initModel(null);
@@ -92,12 +115,14 @@ const executeQuery = async (query: Query): HTMLElement => {
 
     return result_html;
 }
-
+*/
 const arrowToHTML = (result: Table<any>, table_name: string): HTMLElement => {
     const data = JSON.parse(result.toString());
-    const table_definition = document.createElement("details");
+
+    const table_definition = document.createElement("div");
     const wrapper = document.createElement("div");
-    const table_header = document.createElement("summary");
+    const table_header = document.createElement("h3");
+
     table_header.innerText = table_name;
     table_definition.appendChild(table_header);
     table_definition.appendChild(wrapper);
@@ -116,19 +141,26 @@ const arrowToHTML = (result: Table<any>, table_name: string): HTMLElement => {
         { id: 'q75', name: 'Q. 75' },
         { id: 'count', name: 'Rowcount', hidden: true },
     ]
+
+
     new Grid({
         columns: columns,
+
         style: {
+            td: {
+                'min-width': '150px'
+            },
             table: {
                 'white-space': 'nowrap'
             }
         },
+
         pagination: {
             limit: 10
         },
         data: data,
         sort: true,
-        resizable: true
+        fixedHeader: true
     }).render(wrapper);
 
     return table_definition;
@@ -141,4 +173,4 @@ const errorToHTML = (error: Error): HTMLElement => {
     return htmlError;
 }
 
-export { createTablesFromFiles };
+export { createTablesFromFiles, arrowToHTML };

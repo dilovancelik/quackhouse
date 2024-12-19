@@ -10,27 +10,82 @@
 
 <body>
   <div id="app">
-    <h2 class="title">Quackhouse &#129414;</h2>
-    <div class="database_explorer">
-      <div id="tables"></div>
-      <button type="button" id="import_data_button">Import Data</button>
-      <input type="file" name="files" id="files" accept=".json, .csv, .parquet" style="display: none;" multiple />
+    <h1 class="title header">Quackhouse &#129414;</h1>
+
+    <div class="navigation_row">
+      <button type="button">About</button>
+      <button type="button">Data Modelling</button>
+      <button type="button">Visualize</button>
+      <button type="button" id="log_model">Download Model</button>
     </div>
-    <button type="button" id="log_model">Print Model</button>
+    <section id="about" class="about">
+    </section>
+    <section id="datamodel" class="datamodel">
+      <div class="datamodel-visualiser">
+        <div id="data_model" style="width: 100%; height: 100%;"></div>
+        <div class="datamodel_buttons">
+          <button type="button" id="open_import">Create Table</button>
+          <button type="button" id="open_relationship">Create Relationship</button>
+        </div>
+      </div>
+    </section>
+    <section id="visualize" class="visualize"></section>
   </div>
-  <div id="diagram-container" style="position:relative; width:100%; height:100%;">
-    <svg id="edges-layer" style="position:absolute; top:0; left:0; width:100%; height:100%;"></svg>
-    <div class="table-node" style="position:absolute; left:100px; top:200px; width:200px;">
-      <div class="table-header">Customers</div>
-      <div class="columns-container" style="max-height:100px; overflow:auto;">
-        <div class="column" draggable="true" data-column-name="CustomerID">CustomerID</div>
-        <div class="column" draggable="true" data-column-name="Name">Name</div>
+  <input type="file" name="files" id="files" accept=".json, .csv, .parquet" style="display: none;" multiple />
+
+  <div id="create_table_modal" class="modal">
+    <div class="modal_content">
+      <span id="close_table" class="close">&times;</span>
+      <h2>Import Data to Create Table</h2>
+      <p>Upload one or multiple CSV, Parquet or JSON file to create a table</p>
+      <div id="progress_bar" class="progress_bar">
+        <progress id="table_creation_bar" class="table_creation" max="1" value="0.05"></progress>
+        <br>
+        <small id="table_creation_text"></small>
+      </div>
+      <div class="modal_buttons">
+        <button type="button" id="import_data_button">Upload</button>
+      </div>
+
+    </div>
+  </div>
+
+
+  <div id="create_relationship_modal" class="modal">
+    <div class="modal_content">
+      <span id="close_relationship" class="close">&times;</span>
+      <h2>Create Relationships between tables</h2>
+      <div style="display: flex;">
+        <div id="left_table">
+          <input list="left_tables" type="search" placeholder="Table Name" style="width: 90%"></input>
+          <datalist id="left_tables"></datalist>
+          <input list="left_columns" type="search" placeholder="Columns" style="width: 90%"></input>
+          <datalist id="left_columns"></datalist>
+          <div id="chosen_columns"></div>
+        </div>
+        <div id="right_table">
+          <input list="right_tables" type="search" placeholder="Table Name" style="width: 90%"></input>
+          <datalist id="right_tables"></datalist>
+          <input list="right_columns" type="search" placeholder="Columns" style="width: 90%"></input>
+          <datalist id="right_columns"></datalist>
+          <div id="chosen_columns"></div>
+        </div>
       </div>
     </div>
+
+    <div class="modal_buttons">
+      <button type="button" id="auto_rel">Auto Detect</button>
+      <button type="button" id="create_rel">Create Relationship</button>
+    </div>
+  </div>
   </div>
 
-
-
+  <div id="table_summary_modal" class="modal">
+    <div class="modal_content">
+      <span id="close_table_summary" class="close">&times;</span>
+      <div id="table_summary"></div>
+    </div>
+  </div>
 
   <script type="module" src="/src/scripts/main.ts"></script>
 

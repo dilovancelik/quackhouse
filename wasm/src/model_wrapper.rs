@@ -1,3 +1,5 @@
+use serde::Deserialize;
+use serde::Serialize;
 use std::{cell::RefCell, collections::HashMap};
 use wasm_bindgen::prelude::*;
 use web_sys::*;
@@ -18,6 +20,7 @@ impl SemanticModelHandle {
         let model = SemanticModel {
             name,
             tables: HashMap::new(),
+            relationships: vec![],
         };
         SemanticModelHandle {
             model: RefCell::new(model),
@@ -33,7 +36,6 @@ impl SemanticModelHandle {
     ) -> Result<String, JsError> {
         let mut model = self.model.borrow_mut();
 
-        
         let columns: Vec<Column> = match serde_json::from_str::<Vec<Column>>(&jsoncolumns) {
             Ok(cols) => cols,
             Err(e) => return Err(JsError::new(&e.to_string())),
@@ -118,4 +120,78 @@ impl SemanticModelHandle {
             Err(e) => Err(JsError::new(e.to_string().as_str())),
         }
     }
+
+    #[wasm_bindgen]
+    pub fn get_cytoscape_elements(&self) -> Result<String, JsError> {
+        let model = self.model.borrow();
+
+        let mut elements: Vec<CytoscapeElement> = vec![];
+
+        model.tables.values().for_each(|table| {
+            elements.push(CytoscapeElement {
+                data: CytoscapeData {
+                    id: table.name.clone(),
+                    source: None,
+                    target: None,
+                },
+            });
+            table.relationships.keys().for_each(|to_table| {
+                elements.push(CytoscapeElement {
+                    data: CytoscapeData {
+                        id: format!("{}_{}", table.name, to_table),
+                        source: Some(table.name.clone()),
+                        target: Some(to_table.clone()),
+                    },
+                });
+            });
+        });
+        match serde_json::to_string(&elements) {
+            Ok(json) => Ok(json),
+            Err(e) => Err(JsError::new(e.to_string().as_str())),
+        }
+    }
+
+    #[wasm_bindgen]
+    pub fn set_name(&mut self, name: String) {
+        let mut model = self.model.borrow_mut();
+        model.set_name(name);
+    }
+
+    #[wasm_bindgen]
+    pub fn get_name(&self) -> String {
+        let model = self.model.borrow();
+        model.name.clone()
+    }
+
+    #[wasm_bindgen]
+    pub fn auto_detect_relationships(&self) -> Result<String, JsError> {
+        let model = self.model.borrow();
+        let potential_relationsships = model.auto_detect_relationships();
+        match serde_json::to_string(&potential_relationsships) {
+            Ok(json) => Ok(json),
+            Err(e) => Err(JsError::new(e.to_string().as_str())),
+        }
+    }
+
+    #[wasm_bindgen]
+    pub fn get_columns(&self, table_name: String) -> Result<Vec<String>, JsError> {
+        let model = self.model.borrow();
+
+        match model.get_columns(table_name) {
+            Ok(columns) => Ok(columns.iter().map(|col| col.column.clone()).collect()),
+            Err(e) => Err(JsError::new(e.to_string().as_str())),
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize)]
+struct CytoscapeElement {
+    data: CytoscapeData,
+}
+
+#[derive(Serialize, Deserialize)]
+struct CytoscapeData {
+    id: String,
+    source: Option<String>,
+    target: Option<String>,
 }
