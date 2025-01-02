@@ -15,6 +15,7 @@ export const semanticmodelhandle_set_name: (a: number, b: number, c: number) => 
 export const semanticmodelhandle_get_name: (a: number) => [number, number];
 export const semanticmodelhandle_auto_detect_relationships: (a: number) => [number, number, number, number];
 export const semanticmodelhandle_get_columns: (a: number, b: number, c: number) => [number, number, number, number];
+export const semanticmodelhandle_get_table_names: (a: number) => [number, number];
 export const sql_parser_autocomplete: (a: number, b: number, c: number, d: number, e: number) => [number, number];
 export const __wbindgen_export_0: WebAssembly.Table;
 export const __wbindgen_malloc: (a: number, b: number) => number;

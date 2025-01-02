@@ -182,6 +182,16 @@ impl SemanticModelHandle {
             Err(e) => Err(JsError::new(e.to_string().as_str())),
         }
     }
+
+    #[wasm_bindgen]
+    pub fn get_table_names(&self) -> Vec<String> {
+        let model = self.model.borrow();
+        model
+            .tables
+            .keys()
+            .map(|t| t.to_string())
+            .collect::<Vec<String>>()
+    }
 }
 
 #[derive(Serialize, Deserialize)]

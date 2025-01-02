@@ -434,6 +434,15 @@ export class SemanticModelHandle {
         wasm.__wbindgen_free(ret[0], ret[1] * 4, 4);
         return v2;
     }
+    /**
+     * @returns {(string)[]}
+     */
+    get_table_names() {
+        const ret = wasm.semanticmodelhandle_get_table_names(this.__wbg_ptr);
+        var v1 = getArrayJsValueFromWasm0(ret[0], ret[1]).slice();
+        wasm.__wbindgen_free(ret[0], ret[1] * 4, 4);
+        return v1;
+    }
 }
 
 async function __wbg_load(module, imports) {
