@@ -103,30 +103,7 @@
       <span id="close_relationship" class="close">&times;</span>
       <h2>Create Relationships between tables</h2>
       <div>
-        <div style="display: flex; border: 1px solid; border-radius: 1em;">
-          <div id=" left_table">
-            <input list="left_tables" type="search" placeholder="Table Name" style="width: 90%"></input>
-            <datalist id="left_tables"></datalist>
-            <input list="left_columns" type="search" placeholder="Columns" style="width: 90%"></input>
-            <datalist id="left_columns"></datalist>
-            <div id="chosen_columns" style="width: 90%; margin-bottom: 10px; margin-left: 5%;">
-              <small class="card">1: ID <span id="delete">&times;</span></small>
-              <small class="card">2: Name <span id="delete">&times;</span></small>
-            </div>
-          </div>
-          <div id="right_table">
-            <input list="right_tables" type="search" placeholder="Table Name" style="width: 90%"></input>
-            <datalist id="right_tables"></datalist>
-            <input list="right_columns" type="search" placeholder="Columns" style="width: 90%"></input>
-            <datalist id="right_columns"></datalist>
-            <div id="chosen_columns" style="width: 90%; margin-bottom: 10px; margin-left: 5%">
-              <small class="card">1: ID <span id="delete">&times;</span></small>
-              <small class="card">2: Name <span id="delete">&times;</span></small>
-            </div>
-          </div>
-
-          <span id="delete" style="margin: 10px;">&times;</span>
-        </div>
+        <div id="relationships"></div>
         <div class="modal_buttons" style="margin-top: 10px;">
           <button type="button" id="auto_rel">Auto Detect</button>
           <button type="button" id="create_rel">Create Relationship</button>
