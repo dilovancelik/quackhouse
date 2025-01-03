@@ -1,5 +1,6 @@
 use serde::Deserialize;
 use serde::Serialize;
+use std::borrow::Borrow;
 use std::{cell::RefCell, collections::HashMap};
 use wasm_bindgen::prelude::*;
 use web_sys::*;
@@ -191,6 +192,16 @@ impl SemanticModelHandle {
             .keys()
             .map(|t| t.to_string())
             .collect::<Vec<String>>()
+    }
+
+    #[wasm_bindgen]
+    pub fn get_table_relationships(&self, table: String) -> Result<Vec<String>, JsError> {
+        let model = self.model.borrow();
+
+        match model.get_table_relationships(table) {
+            Ok(tables) => Ok(tables),
+            Err(e) => Err(JsError::new(e.to_string().as_str())),
+        }
     }
 }
 

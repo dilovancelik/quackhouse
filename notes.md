@@ -4,4 +4,5 @@ Autodect needs to be implemented so it creates the relationships automatically. 
 
 ### Edit relationship
 
-should happen on double tap of the lines. 
+Should happen on double tap of the lines, it should look like a prefilled create relationship view. 
+

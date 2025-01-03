@@ -1,125 +1,155 @@
 <!doctype html>
 <html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Quack House</title>
+    </head>
 
-<head>
-  <meta charset="UTF-8" />
-  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Quack House</title>
-</head>
+    <body>
+        <div id="app">
+            <h1 class="title header">Quackhouse &#129414;</h1>
 
-<body>
-  <div id="app">
-    <h1 class="title header">Quackhouse &#129414;</h1>
+            <div class="navigation_row">
+                <a type="button" id="about_button">About</a>
+                <a type="button" id="datamodel_button">Data Modelling</a>
+                <a type="button">Visualize</a>
+                <a type="button" id="log_model">Download Model</a>
+            </div>
+            <section id="about" class="about">
+                <div style="padding-left: 10vw; padding-right: 10vw">
+                    <h1>About Us</h1>
+                    <p>
+                        Welcome to our project, the open-source solution for streamlined and efficient data modeling.
+                        Our mission is to empower users with the ability to explore, transform, and understand their
+                        data entirely on their own terms, without compromising privacy or performance.
+                    </p>
+                    <p>
+                        Built on cutting-edge technologies like DuckDB, Rust, and WebAssembly, our platform runs
+                        entirely in your browser, ensuring that your data never leaves your device. By harnessing the
+                        power of modern client-side processing, we provide a robust and secure environment for managing
+                        data while maintaining lightning-fast performance.
+                    </p>
 
-    <div class="navigation_row">
-      <a type="button" id="about_button">About</a>
-      <a type="button" id="datamodel_button">Data Modelling</a>
-      <a type="button">Visualize</a>
-      <a type="button" id="log_model">Download Model</a>
-    </div>
-    <section id="about" class="about">
-      <div style="padding-left: 10vw; padding-right: 10vw;">
-        <h1>About Us</h1>
-        <p>Welcome to our project, the open-source solution for streamlined and efficient data modeling. Our mission
-          is to empower users with the ability to explore, transform, and understand their data entirely on their own
-          terms, without compromising privacy or performance.</p>
-        <p>Built on cutting-edge technologies like DuckDB, Rust, and WebAssembly, our platform runs entirely in your
-          browser, ensuring that your data never leaves your device. By harnessing the power of modern client-side
-          processing, we provide a robust and secure environment for managing data while maintaining lightning-fast
-          performance.</p>
+                    <h2>Our Vision</h2>
+                    <p>We believe data modeling should be:</p>
+                    <ul>
+                        <li>
+                            <strong>Accessible</strong>: Open-source and free for everyone to use and contribute to.
+                        </li>
+                        <li><strong>Private</strong>: Your data stays local, ensuring complete control and privacy.</li>
+                        <li>
+                            <strong>Efficient</strong>: Leveraging the speed and scalability of DuckDB and Rust to
+                            handle even the most complex datasets effortlessly.
+                        </li>
+                        <li>
+                            <strong>User-Friendly</strong>: Designed with simplicity and usability in mind, making data
+                            modeling intuitive for all skill levels.
+                        </li>
+                    </ul>
 
-        <h2>Our Vision</h2>
-        <p>We believe data modeling should be:</p>
-        <ul>
-          <li><strong>Accessible</strong>: Open-source and free for everyone to use and contribute to.</li>
-          <li><strong>Private</strong>: Your data stays local, ensuring complete control and privacy.</li>
-          <li><strong>Efficient</strong>: Leveraging the speed and scalability of DuckDB and Rust to handle even the
-            most complex datasets effortlessly.</li>
-          <li><strong>User-Friendly</strong>: Designed with simplicity and usability in mind, making data modeling
-            intuitive for all skill levels.</li>
-        </ul>
+                    <h2>Key Features</h2>
+                    <ul>
+                        <li>
+                            <strong>Local Data Processing</strong>: All computations are performed directly in your
+                            browser, ensuring no external servers are involved.
+                        </li>
+                        <li>
+                            <strong>Blazing Fast Performance</strong>: Powered by DuckDB and Rust, our platform delivers
+                            unparalleled speed and efficiency.
+                        </li>
+                        <li>
+                            <strong>Cross-Platform Compatibility</strong>: Runs seamlessly on any modern browser without
+                            requiring additional installations.
+                        </li>
+                        <li>
+                            <strong>Open-Source Community</strong>: Developed transparently, with contributions from
+                            developers around the world.
+                        </li>
+                    </ul>
 
-        <h2>Key Features</h2>
-        <ul>
-          <li><strong>Local Data Processing</strong>: All computations are performed directly in your browser,
-            ensuring no external servers are involved.</li>
-          <li><strong>Blazing Fast Performance</strong>: Powered by DuckDB and Rust, our platform delivers
-            unparalleled speed and efficiency.</li>
-          <li><strong>Cross-Platform Compatibility</strong>: Runs seamlessly on any modern browser without requiring
-            additional installations.</li>
-          <li><strong>Open-Source Community</strong>: Developed transparently, with contributions from developers
-            around the world.</li>
-        </ul>
+                    <h2>Why We Built This</h2>
+                    <p>
+                        In a world increasingly driven by data, we recognized the need for tools that combine power and
+                        simplicity without sacrificing privacy. Our project bridges the gap, providing an open,
+                        local-first solution for anyone looking to model and analyze their data effectively.
+                    </p>
 
-        <h2>Why We Built This</h2>
-        <p>In a world increasingly driven by data, we recognized the need for tools that combine power and simplicity
-          without sacrificing privacy. Our project bridges the gap, providing an open, local-first solution for anyone
-          looking to model and analyze their data effectively.</p>
+                    <h2>Join Us</h2>
+                    <p>
+                        We’re more than just a tool – we’re a community of data enthusiasts, developers, and innovators.
+                        Whether you want to contribute to the project, suggest features, or simply explore its
+                        capabilities, we welcome you to be a part of our journey.
+                    </p>
 
-        <h2>Join Us</h2>
-        <p>We’re more than just a tool – we’re a community of data enthusiasts, developers, and innovators. Whether
-          you want to contribute to the project, suggest features, or simply explore its capabilities, we welcome you
-          to be a part of our journey.</p>
-
-        <p>Discover the future of data modeling today – built for you, powered by open-source technology.</p>
-
-      </div>
-
-    </section>
-    <section id="datamodel" class="datamodel">
-      <div class="datamodel-visualiser">
-        <div id="data_model" style="width: 100%; height: 100%;"></div>
-        <div class="datamodel_buttons">
-          <button type="button" id="open_import">Create Table</button>
-          <button type="button" id="open_relationship">Create Relationship</button>
+                    <p>
+                        Discover the future of data modeling today – built for you, powered by open-source technology.
+                    </p>
+                </div>
+            </section>
+            <section id="datamodel" class="datamodel">
+                <div class="datamodel-visualiser">
+                    <div id="data_model" style="width: 100%; height: 100%"></div>
+                    <div class="datamodel_buttons">
+                        <button type="button" id="open_import">Create Table</button>
+                        <button type="button" id="open_relationship" disabled>Create Relationship</button>
+                    </div>
+                </div>
+            </section>
+            <section id="visualize" class="visualize"></section>
         </div>
-      </div>
-    </section>
-    <section id="visualize" class="visualize"></section>
-  </div>
-  <input type="file" name="files" id="files" accept=".json, .csv, .parquet" style="display: none;" multiple />
+        <input type="file" name="files" id="files" accept=".json, .csv, .parquet" style="display: none" multiple />
 
-  <div id="create_table_modal" class="modal">
-    <div class="modal_content">
-      <span id="close_table" class="close">&times;</span>
-      <h2>Import Data to Create Table</h2>
-      <p>Upload one or multiple CSV, Parquet or JSON file to create a table</p>
-      <div id="progress_bar" class="progress_bar">
-        <progress id="table_creation_bar" class="table_creation" max="1" value="0.05"></progress>
-        <br>
-        <small id="table_creation_text"></small>
-      </div>
-      <div class="modal_buttons">
-        <button type="button" id="import_data_button">Upload</button>
-      </div>
-
-    </div>
-  </div>
-
-
-  <div id="create_relationship_modal" class="modal">
-    <div class="modal_content">
-      <span id="close_relationship" class="close">&times;</span>
-      <h2>Create Relationships between tables</h2>
-      <div>
-        <div id="relationships"></div>
-        <div class="modal_buttons" style="margin-top: 10px;">
-          <button type="button" id="auto_rel">Auto Detect</button>
-          <button type="button" id="create_rel">Create Relationship</button>
+        <div id="create_table_modal" class="modal">
+            <div class="modal_content">
+                <span id="close_table" class="close">&times;</span>
+                <h2>Import Data to Create Table</h2>
+                <p>Upload one or multiple CSV, Parquet or JSON file to create a table</p>
+                <div id="progress_bar" class="progress_bar">
+                    <progress id="table_creation_bar" class="table_creation" max="1" value="0.05"></progress>
+                    <br />
+                    <small id="table_creation_text"></small>
+                </div>
+                <div class="modal_buttons">
+                    <button type="button" id="import_data_button">Upload</button>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-  </div>
-  <div id="table_summary_modal" class="modal">
-    <div class="modal_content">
-      <span id="close_table_summary" class="close">&times;</span>
-      <div id="table_summary"></div>
-    </div>
-  </div>
 
-  <script type="module" src="/src/scripts/main.ts"></script>
+        <div id="create_relationship_modal" class="modal">
+            <div class="modal_content">
+                <span id="close_relationship" class="close">&times;</span>
+                <h2>Create Relationships between tables</h2>
+                <div>
+                    <div id="relationships">
+                        <div class="join_container">
+                            <span class="close">×</span>
+                            <div class="columns_container">
+                                <div class="table_group">
+                                    <select style="width: 90%" id="table_a"></select>
+                                    <ul style="width: 90%" id="columns_a"></ul>
+                                </div>
+                                <div class="table_group">
+                                    <select style="width: 90%" id="table_b"></select>
+                                    <ul style="width: 90%" id="columns_b"></ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal_buttons" style="margin-top: 10px">
+                        <button type="button" id="create_rel">Create Relationship</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="table_summary_modal" class="modal">
+            <div class="modal_content">
+                <span id="close_table_summary" class="close">&times;</span>
+                <div id="table_summary"></div>
+            </div>
+        </div>
 
-</body>
-
+        <script type="module" src="/src/scripts/main.ts"></script>
+    </body>
 </html>

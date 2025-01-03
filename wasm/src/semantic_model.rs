@@ -191,6 +191,14 @@ impl SemanticModel {
             None => Err(format!("No table called {}", table_name)),
         }
     }
+
+    pub fn get_table_relationships(&self, table_name: String) -> Result<Vec<String>, String> {
+        match self.tables.get(&table_name) {
+            Some(t) => Ok(t.relationships.keys().map(|rel| rel.to_string()).collect::<Vec<String>>()),
+            None => Err(format!("No table called {}", table_name)),
+            
+        }
+    }
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]

@@ -9,7 +9,7 @@ import type { Table } from 'apache-arrow';
 
 import { initModel } from './semantic_layer';
 
-import { /*Query,*/ SemanticModelHandle } from '../../public/wasm/wasm';
+import { SemanticModelHandle } from '../../public/wasm/wasm';
 import { createMap } from './model_visualiser';
 
 const createTablesFromFiles = async (files: FileList) => {
@@ -37,6 +37,7 @@ const createTablesFromFiles = async (files: FileList) => {
                 progress_bar.dispatchEvent(creation_event);
             }
         });
+        (<HTMLButtonElement>document.getElementById("open_relationship"))!.disabled = false;
     } catch (error) {
         console.log(errorToHTML(error as Error));
     }

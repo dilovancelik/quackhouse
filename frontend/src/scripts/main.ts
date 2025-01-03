@@ -1,16 +1,15 @@
-import { Relationship } from "../../public/wasm/wasm";
 import "../styles/gridjs.css";
 import "../styles/style.css";
 
 import { createTablesFromFiles } from "./duckdb_wrapper";
-import { autodetect_relationships, initModel } from "./semantic_layer";
+import { initModel } from "./semantic_layer";
 
 const processInputFiles = async () => {
     const files = (<HTMLInputElement>document.getElementById("files")!).files!;
     await createTablesFromFiles(files);
 };
 
-const generateTableRelationshipDiv = (): HTMLDivElement => {
+const generateTableRelationshipDiv = (id: string): HTMLDivElement => {
     const model = initModel(null);
 
     const div = document.createElement("div");
@@ -18,6 +17,7 @@ const generateTableRelationshipDiv = (): HTMLDivElement => {
 
     const potential_tables = model.get_table_names();
     const table_list = document.createElement("select");
+    table_list.id = `table_${id}`;
 
     potential_tables.forEach((table) => {
         const option = document.createElement("option");
@@ -28,14 +28,14 @@ const generateTableRelationshipDiv = (): HTMLDivElement => {
 
     table_list.style.width = "90%";
     div.appendChild(table_list);
-    
+
     table_list.addEventListener("change", () => {
-        div.querySelectorAll("ul").forEach(e => e.remove());
+        div.querySelectorAll("ul").forEach((e) => e.remove());
         const column_list = get_columns(table_list.value);
+        column_list.id = `columns_${id}`;
         div.appendChild(column_list);
     });
     table_list.dispatchEvent(new Event("change"));
-
 
     return div;
 };
@@ -45,7 +45,6 @@ const get_columns = (table: string): HTMLUListElement => {
     const potential_columns: string[] = [];
     model.get_columns(table).forEach((column) => potential_columns.push(column));
 
-    
     const column_list = document.createElement("ul");
     potential_columns.forEach((col) => {
         const column = document.createElement("li");
@@ -58,7 +57,7 @@ const get_columns = (table: string): HTMLUListElement => {
     column_list.style.width = "90%";
 
     return column_list;
-}
+};
 
 const createRelationshipDiv = (): HTMLDivElement => {
     const side_a = generateTableRelationshipDiv();
@@ -81,7 +80,6 @@ const createRelationshipDiv = (): HTMLDivElement => {
     });
     return main_div;
 };
-
 
 document.getElementById("import_data_button")?.addEventListener("click", () => {
     console.log("click");
@@ -118,6 +116,11 @@ document.getElementById("close_table")?.addEventListener("click", () => {
 
 document.getElementById("open_relationship")?.addEventListener("click", () => {
     document.getElementById("create_relationship_modal")!.style.display = "block";
+    const rel_div = document.getElementById("relationships");
+    rel_div!.innerHTML = "";
+    const join_div = createRelationshipDiv();
+    
+    rel_div?.appendChild(join_div);
 });
 
 document.getElementById("close_relationship")?.addEventListener("click", () => {
@@ -156,42 +159,6 @@ document.getElementById("progress_bar")?.addEventListener("table_creation_finish
     document.getElementById("create_table_modal")!.style.display = "none";
 });
 
-document.getElementById("auto_rel")?.addEventListener("click", () => {
-    const model = initModel(null);
-    const relationships: Relationship[] = autodetect_relationships(model);
-
-    const close = document.createElement("span");
-    close.innerHTML = "&times;";
-    close.classList.add("close");
-    const main_div = document.createElement("div");
-    
-    const view_table = document.createElement("table");
-
-    const header = document.createElement("thead");
-    const header_row = document.createElement("tr");
-
-    const a_head = document.createElement("th");
-    a_head.innerText = "Table A";
-
-    const b_head = document.createElement("th");
-    b_head.innerText = "Table B";
-
-    const columns = document.createElement("th");
-    columns.innerText = "Columns";
-
-    const check = document.createElement("th");
-    header_row.appendChild(a_head);
-    header_row.appendChild(b_head);
-    header_row.appendChild(columns);
-    header_row.appendChild(check);
-
-    header.appendChild(header_row);
-
-    const body = document.createElement("tbody");
-    relationships.forEach((rel) => { console.log(rel)    })
-    console.log(relationships);
-});
-
 document.getElementById("about_button")?.addEventListener("click", () => {
     document.getElementById("about")!.style.display = "block";
     document.getElementById("datamodel")!.style.display = "none";
@@ -203,8 +170,4 @@ document.getElementById("datamodel_button")?.addEventListener("click", () => {
 });
 
 document.getElementById("create_rel")?.addEventListener("click", () => {
-    const rel_div = document.getElementById("relationships");
-    const join_div = createRelationshipDiv();
-
-    rel_div?.appendChild(join_div);
-})
+});
