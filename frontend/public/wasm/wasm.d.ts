@@ -18,7 +18,7 @@ export class SemanticModelHandle {
   set_name(name: string): void;
   get_name(): string;
   auto_detect_relationships(): string;
-  get_columns(table_name: string): (string)[];
+  get_columns(table_name: string): string;
   get_table_names(): (string)[];
   get_table_relationships(table: string): (string)[];
 }

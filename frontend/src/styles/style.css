@@ -319,10 +319,12 @@ button:focus-visible {
     flex-direction: column;
     gap: 15px;
     flex: 1;
+    width: 100%;
 }
 
 .columns_container select {
     appearance: none;
+    min-width: 100%;
     -webkit-appearance: none;
     -moz-appearance: none;
     padding: 10px;
@@ -335,14 +337,13 @@ button:focus-visible {
     width: 100%;
     box-sizing: border-box;
 }
-
+/*
 .columns_container select:hover,
 .columns_container select:focus {
     border-color: #646cff;
     outline: none;
 }
-
-/* Styling the column list */
+*/
 .columns_container ul {
     list-style-type: none;
     padding: 0;
@@ -350,7 +351,7 @@ button:focus-visible {
     background: #fff;
     border: 1px solid #ccc;
     border-radius: 6px;
-    width: 100%;
+    min-width: 100%;
     max-height: 300px;
     overflow-y: auto;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -366,6 +367,7 @@ button:focus-visible {
         color 0.3s ease;
 }
 
+
 .columns_container li:last-child {
     border-bottom: none;
 }
@@ -374,17 +376,16 @@ button:focus-visible {
 }
 
 .columns_container li.selected {
-    background-color: #34c759;
-    color: white;
+    background-color: #f0f8ff;
     font-weight: bold;
-    border-left: 4px solid #2f9e4f;
+    border-left: 4px solid #646cff;
 }
+
 
 .columns_container {
     display: flex;
     justify-content: space-between;
     gap: 20px;
-    border: 1px solid #e6e6e6;
     padding: 10px;
     border-radius: 10px;
     margin-bottom: 15px;

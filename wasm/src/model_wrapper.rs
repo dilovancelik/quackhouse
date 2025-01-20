@@ -1,6 +1,5 @@
 use serde::Deserialize;
 use serde::Serialize;
-use std::borrow::Borrow;
 use std::{cell::RefCell, collections::HashMap};
 use wasm_bindgen::prelude::*;
 use web_sys::*;
@@ -175,11 +174,23 @@ impl SemanticModelHandle {
     }
 
     #[wasm_bindgen]
-    pub fn get_columns(&self, table_name: String) -> Result<Vec<String>, JsError> {
+    pub fn get_columns(&self, table_name: String) -> Result<String, JsError> {
         let model = self.model.borrow();
 
         match model.get_columns(table_name) {
-            Ok(columns) => Ok(columns.iter().map(|col| col.column.clone()).collect()),
+            Ok(columns) => {
+                let res = columns
+                    .iter()
+                    .map(|col| ColumnWasm {
+                        name: col.column.clone(),
+                        data_type: col.data_type.clone(),
+                    })
+                    .collect::<Vec<ColumnWasm>>();
+                match serde_json::to_string(&res) {
+                    Ok(json) => Ok(json),
+                    Err(e) => Err(JsError::new(e.to_string().as_str())),
+                }
+            }
             Err(e) => Err(JsError::new(e.to_string().as_str())),
         }
     }
@@ -215,4 +226,10 @@ struct CytoscapeData {
     id: String,
     source: Option<String>,
     target: Option<String>,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct ColumnWasm {
+    name: String,
+    data_type: String,
 }

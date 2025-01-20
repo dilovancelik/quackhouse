@@ -18,6 +18,12 @@ const generateTableRelationshipDiv = (id: string): HTMLDivElement => {
     const potential_tables = model.get_table_names();
     const table_list = document.createElement("select");
     table_list.id = `table_${id}`;
+    const header_option = document.createElement("option");
+    header_option.innerText = "Select a Table";
+    header_option.disabled = true;
+    header_option.selected = true;
+
+    table_list.appendChild(header_option);
 
     potential_tables.forEach((table) => {
         const option = document.createElement("option");
@@ -34,6 +40,22 @@ const generateTableRelationshipDiv = (id: string): HTMLDivElement => {
         const column_list = get_columns(table_list.value);
         column_list.id = `columns_${id}`;
         div.appendChild(column_list);
+
+        const other_table_id = id === "a" ? "table_b" : "table_a";
+        const other_table = document.getElementById(other_table_id)!;
+        const active_relationships = model.get_table_relationships(table_list.value);
+        other_table.querySelectorAll("option").forEach((table) => {
+            table.disabled = false;
+            if (active_relationships.includes(table.value)) {
+                table.disabled = true;
+                table.selected = false;
+            }
+
+            if (table.value === table_list.value) {
+                table.disabled = true;
+                table.selected = false;
+            }
+        });
     });
     table_list.dispatchEvent(new Event("change"));
 
@@ -42,32 +64,40 @@ const generateTableRelationshipDiv = (id: string): HTMLDivElement => {
 
 const get_columns = (table: string): HTMLUListElement => {
     const model = initModel(null);
-    const potential_columns: string[] = [];
-    model.get_columns(table).forEach((column) => potential_columns.push(column));
+    const json_string = model.get_columns(table)
+    let potential_columns: ColumnDataType[] = JSON.parse(json_string);
 
     const column_list = document.createElement("ul");
     potential_columns.forEach((col) => {
         const column = document.createElement("li");
-        column.innerText = col;
-        column.dataset.name = col;
+        column.innerText = `${col.name} (${col.data_type.toLowerCase()})`;
+        column.dataset.name = col.name;
+        column.dataset.type = col.data_type;
         column.dataset.selected = "false";
         column.dataset.order = "-1";
         column_list.appendChild(column);
     });
     column_list.style.width = "90%";
+    column_list.addEventListener("click", (e) => {
+        let target = (<HTMLLIElement>e.target);
+        if (target.dataset.selected == "false") {
+            target.classList.add("selected");
+            target.dataset.selected = "true";
+        } else {
+            target.dataset.selected = "false";
+            target.classList.remove("selected");
+        }
+        console.log(e.target);
+    });
 
     return column_list;
 };
 
 const createRelationshipDiv = (): HTMLDivElement => {
-    const side_a = generateTableRelationshipDiv();
-    const side_b = generateTableRelationshipDiv();
-    const close = document.createElement("span");
-    close.innerHTML = "&times;";
-    close.classList.add("close");
+    const side_a = generateTableRelationshipDiv("a");
+    const side_b = generateTableRelationshipDiv("b");
     const main_div = document.createElement("div");
     main_div.classList.add("join_container");
-    main_div.appendChild(close);
     const columns_div = document.createElement("div");
     columns_div.classList.add("columns_container");
 
@@ -75,9 +105,6 @@ const createRelationshipDiv = (): HTMLDivElement => {
     columns_div.appendChild(side_b);
     main_div.appendChild(columns_div);
 
-    close.addEventListener("click", () => {
-        main_div.remove();
-    });
     return main_div;
 };
 
@@ -169,5 +196,11 @@ document.getElementById("datamodel_button")?.addEventListener("click", () => {
     document.getElementById("datamodel")!.style.display = "block";
 });
 
+
 document.getElementById("create_rel")?.addEventListener("click", () => {
 });
+
+type ColumnDataType = {
+    name: string;
+    data_type: string;
+}
