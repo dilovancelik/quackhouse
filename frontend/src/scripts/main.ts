@@ -1,7 +1,9 @@
+import { SemanticModelHandle } from "../../public/wasm/wasm";
 import "../styles/gridjs.css";
 import "../styles/style.css";
 
 import { createTablesFromFiles } from "./duckdb_wrapper";
+import { createMap } from "./model_visualiser";
 import { initModel } from "./semantic_layer";
 
 const processInputFiles = async () => {
@@ -64,10 +66,11 @@ const generateTableRelationshipDiv = (id: string): HTMLDivElement => {
 
 const get_columns = (table: string): HTMLUListElement => {
     const model = initModel(null);
-    const json_string = model.get_columns(table)
+    const json_string = model.get_columns(table);
     let potential_columns: ColumnDataType[] = JSON.parse(json_string);
 
     const column_list = document.createElement("ul");
+    column_list.dataset.total_selected = "0";
     potential_columns.forEach((col) => {
         const column = document.createElement("li");
         column.innerText = `${col.name} (${col.data_type.toLowerCase()})`;
@@ -79,13 +82,28 @@ const get_columns = (table: string): HTMLUListElement => {
     });
     column_list.style.width = "90%";
     column_list.addEventListener("click", (e) => {
-        let target = (<HTMLLIElement>e.target);
+        let target = <HTMLLIElement>e.target;
         if (target.dataset.selected == "false") {
             target.classList.add("selected");
             target.dataset.selected = "true";
+            column_list.dataset.total_selected = (parseInt(column_list.dataset.total_selected!) + 1).toString();
+            target.dataset.order = column_list.dataset.total_selected;
+            target.innerText = `${target.dataset.order}. ` + target.innerText;
         } else {
             target.dataset.selected = "false";
             target.classList.remove("selected");
+            let removed_number = target.dataset.order!;
+            column_list.dataset.total_selected = (parseInt(column_list.dataset.total_selected!) - 1).toString();
+            target.innerText = target.innerText.replace(`${target.dataset.order}. `, "");
+            target.dataset.order = "-1";
+            column_list.querySelectorAll('[data-selected="true"]').forEach((el: Element) => {
+                let item = (<HTMLLIElement>el)!;
+                let old_order = item.dataset.order!;
+                if (old_order >= removed_number) {
+                    item.dataset.order = (parseInt(item.dataset.order!) - 1).toString();
+                    item.innerText = item.innerText.replace(`${old_order}. `, `${item.dataset.order}. `);
+                }
+            });
         }
         console.log(e.target);
     });
@@ -106,6 +124,65 @@ const createRelationshipDiv = (): HTMLDivElement => {
     main_div.appendChild(columns_div);
 
     return main_div;
+};
+
+const validateAndCreateRelationship = (model: SemanticModelHandle) => {
+    const table_a = (<HTMLSelectElement>document.getElementById("table_a"))!.value;
+    const table_b = (<HTMLSelectElement>document.getElementById("table_b"))!.value;
+    let column_a_len = parseInt((<HTMLUListElement>document.getElementById("columns_a"))!.dataset.total_selected!)!;
+    let retrieved_column_a = new Map<number, ColumnDataType>();
+    (<HTMLUListElement>document.getElementById("columns_a"))!
+        .querySelectorAll("[data-selected=true]")
+        .forEach((item) => {
+            let column = (<HTMLLIElement>item)!;
+            let order = parseInt(column.dataset.order!);
+            retrieved_column_a.set(order, {
+                name: column.dataset.name!,
+                data_type: column.dataset.type!,
+            });
+        });
+
+    let column_b_len = parseInt((<HTMLUListElement>document.getElementById("columns_b"))!.dataset.total_selected!)!;
+    let retrieved_column_b = new Map<number, ColumnDataType>();
+    (<HTMLUListElement>document.getElementById("columns_b"))!
+        .querySelectorAll("[data-selected=true]")
+        .forEach((item) => {
+            let column = (<HTMLLIElement>item)!;
+            let order = parseInt(column.dataset.order!);
+            retrieved_column_b.set(order, {
+                name: column.dataset.name!,
+                data_type: column.dataset.type!,
+            });
+        });
+
+    if (column_a_len != column_b_len) {
+        throw new Error("Both sides of the relationship must have the same amount of columns");
+    }
+    if (column_a_len <= 0) {
+        throw new Error("You must select atleast 1 column on each side");
+    }
+
+    let columns_a = [];
+    let columns_b = [];
+
+    console.log(retrieved_column_a);
+    for (let i = 1; i <= column_a_len; i++) {
+        let a = retrieved_column_a.get(i)!;
+        let b = retrieved_column_b.get(i)!;
+        console.log(a);
+        console.log(b);
+
+        if (a.data_type == b.data_type) {
+            columns_a.push(a.name);
+            columns_b.push(b.name);
+        } else {
+            throw new Error(
+                `Columns must have the same type ${a.name} is of type ${a.data_type}, and ${b.name} is of type ${b.data_type}`,
+            );
+        }
+    }
+
+    model.add_update_relationship(table_a, table_b, columns_a, columns_b);
 };
 
 document.getElementById("import_data_button")?.addEventListener("click", () => {
@@ -146,7 +223,7 @@ document.getElementById("open_relationship")?.addEventListener("click", () => {
     const rel_div = document.getElementById("relationships");
     rel_div!.innerHTML = "";
     const join_div = createRelationshipDiv();
-    
+
     rel_div?.appendChild(join_div);
 });
 
@@ -196,11 +273,26 @@ document.getElementById("datamodel_button")?.addEventListener("click", () => {
     document.getElementById("datamodel")!.style.display = "block";
 });
 
-
 document.getElementById("create_rel")?.addEventListener("click", () => {
+    const model = initModel(null);
+    try {
+        validateAndCreateRelationship(model);
+    } catch (error) {
+        alert(error);
+        return;
+    }
+
+    createMap(model);
+
+    alert("Relationship added")
+
+    const rel_div = document.getElementById("relationships");
+    rel_div!.innerHTML = "";
+    const join_div = createRelationshipDiv();
+    rel_div?.appendChild(join_div);
 });
 
 type ColumnDataType = {
     name: string;
     data_type: string;
-}
+};

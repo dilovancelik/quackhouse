@@ -381,7 +381,6 @@ button:focus-visible {
     border-left: 4px solid #646cff;
 }
 
-
 .columns_container {
     display: flex;
     justify-content: space-between;
