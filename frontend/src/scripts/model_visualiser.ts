@@ -7,7 +7,6 @@ const createMap = (model: SemanticModelHandle) => {
     const elements = JSON.parse(model.get_cytoscape_elements());
 
     let prefers_darkmode = window.matchMedia("(prefers-color-scheme: dark)").matches;
-    console.log(elements);
     const cy = cytoscape({
         container: document.getElementById("data_model"), // an HTML element you provide in your index.html
         elements: elements,
@@ -55,6 +54,15 @@ const createMap = (model: SemanticModelHandle) => {
 
     cy.on("tap", "node", (e) => {
         showTable(e);
+    });
+
+    cy.on("tap", "edge", (e) => {
+        const data: CYEventData = e.target.data();
+        let relationship: Relationship[] = JSON.parse(model.get_relationship(data.source, data.target));
+
+        console.log(relationship);
+        updateRelationship(relationship);
+
     });
 };
 
@@ -128,5 +136,55 @@ const showTable = async (event: cytoscape.EventObject) => {
     container.classList.add("dark-mode");
     table_modal.style.display = "block";
 };
+
+const updateRelationship = (relationship: Relationship[]) => {
+    document.getElementById("open_relationship")!.click();
+    console.log(relationship);
+
+    const table_a = (<HTMLSelectElement>document.getElementById("table_a")!);
+    const table_b = (<HTMLSelectElement>document.getElementById("table_b")!);
+
+    table_a.value = relationship[0].from_column.table;
+    table_a.dispatchEvent(new Event('change'));
+    table_b.value = relationship[0].to_column.table;
+    table_b.dispatchEvent(new Event('change'));
+    table_a.value = relationship[0].from_column.table;
+
+    const columns_a = (<HTMLUListElement>document.getElementById("columns_a")!);
+    const columns_b = (<HTMLUListElement>document.getElementById("columns_b")!);
+    
+    relationship.forEach((rel) => {
+        for (var col of columns_a.children) {
+            let item = <HTMLLIElement>col;
+            if (item.innerText === `${rel.from_column.column} (${rel.from_column.data_type.toLowerCase()})`) {
+                item.click();
+            }
+        }
+        for (var col of columns_b.children) {
+            let item = <HTMLLIElement>col;
+            if (item.innerText === `${rel.to_column.column} (${rel.to_column.data_type.toLowerCase()})`) {
+                item.click();
+            }
+        }
+    });
+}
+
+type CYEventData = {
+    id: string,
+    source: string,
+    target: string
+}
+
+type Relationship = {
+    from_column: RelationshipColumn,
+    to_column: RelationshipColumn
+}
+
+type RelationshipColumn = {
+    table: string,
+    column: string,
+    data_type: string,
+    description: string
+}
 
 export { createMap };

@@ -105,7 +105,6 @@ const get_columns = (table: string): HTMLUListElement => {
                 }
             });
         }
-        console.log(e.target);
     });
 
     return column_list;
@@ -165,12 +164,9 @@ const validateAndCreateRelationship = (model: SemanticModelHandle) => {
     let columns_a = [];
     let columns_b = [];
 
-    console.log(retrieved_column_a);
     for (let i = 1; i <= column_a_len; i++) {
         let a = retrieved_column_a.get(i)!;
         let b = retrieved_column_b.get(i)!;
-        console.log(a);
-        console.log(b);
 
         if (a.data_type == b.data_type) {
             columns_a.push(a.name);
@@ -186,7 +182,6 @@ const validateAndCreateRelationship = (model: SemanticModelHandle) => {
 };
 
 document.getElementById("import_data_button")?.addEventListener("click", () => {
-    console.log("click");
     document.getElementById("files")?.click();
 });
 
@@ -296,3 +291,16 @@ type ColumnDataType = {
     name: string;
     data_type: string;
 };
+
+type Relationship = {
+    from_column: {
+        table: string,
+        column: string,
+        description: string
+    },
+    to_column: {
+        table: string,
+        column: string,
+        description: string
+    }
+}

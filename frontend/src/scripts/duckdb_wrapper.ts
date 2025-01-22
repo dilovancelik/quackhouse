@@ -117,6 +117,7 @@ const executeQuery = async (query: Query): HTMLElement => {
     return result_html;
 }
 */
+
 const arrowToHTML = (result: Table<any>, table_name: string): HTMLElement => {
     const data = JSON.parse(result.toString());
 

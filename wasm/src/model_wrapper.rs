@@ -66,16 +66,14 @@ impl SemanticModelHandle {
         &self,
         from_table: String,
         to_table: String,
-        from_columns: Vec<String>,
-        to_columns: Vec<String>,
+        columns: Vec<(String, String)>,
     ) -> Result<String, JsError> {
         let mut model = self.model.borrow_mut();
 
         match model.add_update_relationship(
             from_table.clone(),
             to_table.clone(),
-            from_columns,
-            to_columns,
+            columns,
         ) {
             Ok(()) => Ok(format!(
                 "Relationship between {} and {} successfully created",

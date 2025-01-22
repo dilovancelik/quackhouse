@@ -57,18 +57,23 @@ impl SemanticModel {
         &mut self,
         from_table: String,
         to_table: String,
-        from_columns: Vec<String>,
-        to_columns: Vec<String>,
+        columns: Vec<(String, String)>,
     ) -> Result<(), String> {
         if !self.tables.contains_key(&from_table) || !self.tables.contains_key(&to_table) {
             return Err("Table does not exists".into());
         }
 
+        let mut _ca = vec![];
+        let mut _cb = vec![]; 
+
+        columns.iter().for_each(|col_t| {
+            _ca.push(col_t.0.clone());
+            _cb.push(col_t.1.clone());
+        });
         let new_rel = Relationship {
             table_a: from_table.clone(),
-            columns_a: from_columns.clone(),
             table_b: to_table.clone(),
-            columns_b: to_columns.clone(),
+            columns: columns.clone(),
         };
         for i in 0..self.relationships.len() {
             if new_rel == self.relationships[i] {
@@ -83,12 +88,12 @@ impl SemanticModel {
             let from_cols = table_1
                 .columns
                 .iter()
-                .filter(|col| from_columns.contains(&col.column))
+                .filter(|col| _ca.contains(&col.column))
                 .collect::<Vec<&Column>>();
             let to_cols = table_2
                 .columns
                 .iter()
-                .filter(|col| to_columns.contains(&col.column))
+                .filter(|col| _cb.contains(&col.column))
                 .collect::<Vec<&Column>>();
 
             let mut joins: Vec<Join> = vec![];
@@ -169,7 +174,7 @@ impl SemanticModel {
                     .collect::<Vec<String>>();
                 let potential_rel = Relationship {
                     table_a: table_name.clone(),
-                    columns_a: join_columns.clone(),
+                    columns: join_columns.clone(),
                     table_b: target_table_name.clone(),
                     columns_b: join_columns.clone(),
                 };
@@ -215,9 +220,8 @@ impl SemanticModel {
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Relationship {
     table_a: String,
-    columns_a: Vec<String>,
     table_b: String,
-    columns_b: Vec<String>,
+    columns: Vec<(String, String)>,
 }
 
 impl PartialEq for Relationship {
