@@ -21,6 +21,7 @@ export class SemanticModelHandle {
   get_columns(table_name: string): string;
   get_table_names(): (string)[];
   get_table_relationships(table: string): (string)[];
+  get_relationship(table_a: string, table_b: string): string;
 }
 
 export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembly.Module;
@@ -43,6 +44,7 @@ export interface InitOutput {
   readonly semanticmodelhandle_get_columns: (a: number, b: number, c: number) => [number, number, number, number];
   readonly semanticmodelhandle_get_table_names: (a: number) => [number, number];
   readonly semanticmodelhandle_get_table_relationships: (a: number, b: number, c: number) => [number, number, number, number];
+  readonly semanticmodelhandle_get_relationship: (a: number, b: number, c: number, d: number, e: number) => [number, number, number, number];
   readonly sql_parser_autocomplete: (a: number, b: number, c: number, d: number, e: number) => [number, number];
   readonly __wbindgen_export_0: WebAssembly.Table;
   readonly __wbindgen_malloc: (a: number, b: number) => number;

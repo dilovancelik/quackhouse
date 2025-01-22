@@ -196,7 +196,18 @@ impl SemanticModel {
         match self.tables.get(&table_name) {
             Some(t) => Ok(t.relationships.keys().map(|rel| rel.to_string()).collect::<Vec<String>>()),
             None => Err(format!("No table called {}", table_name)),
-            
+        }
+    }
+
+    pub fn get_relationship(&self, table_a: String, table_b: String) -> Result<Vec<Join>, String> {
+        match self.tables.get(&table_a) {
+            Some(source) => {
+                match source.relationships.get(&table_b) {
+                    Some(target) => Ok(target.clone()),
+                    None => Err(format!("Table {} does not have a relationship to {}", table_a, table_b))
+                }
+            },
+            None => Err(format!("No table called {}", table_a)),
         }
     }
 }

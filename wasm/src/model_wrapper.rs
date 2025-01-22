@@ -214,6 +214,19 @@ impl SemanticModelHandle {
             Err(e) => Err(JsError::new(e.to_string().as_str())),
         }
     }
+
+    #[wasm_bindgen]
+    pub fn get_relationship(&self, table_a: String, table_b: String) -> Result<String, JsError> {
+        let model = self.model.borrow();
+
+        match model.get_relationship(table_a, table_b) {
+            Ok(rel) => match serde_json::to_string(&rel) {
+                Ok(json) => Ok(json),
+                Err(e) => Err(JsError::new(e.to_string().as_str())),
+            },
+            Err(e) => Err(JsError::new(e.to_string().as_str())),
+        }
+    }
 }
 
 #[derive(Serialize, Deserialize)]
