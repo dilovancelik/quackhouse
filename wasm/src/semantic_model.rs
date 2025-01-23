@@ -11,6 +11,17 @@ pub struct Column {
     pub description: Option<String>,
 }
 
+impl PartialEq for Column {
+    fn eq(&self, other: &Self) -> bool {
+        if self.column == other.column && self.data_type == other.data_type {
+            return true
+        } else {
+            return false
+        }
+    }
+    
+}
+
 impl fmt::Display for Column {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{}.{}", self.table, self.column)
@@ -19,8 +30,8 @@ impl fmt::Display for Column {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Join {
-    from_column: Column,
-    to_column: Column,
+    pub from_column: Column,
+    pub to_column: Column,
 }
 
 impl fmt::Display for Join {
@@ -57,23 +68,16 @@ impl SemanticModel {
         &mut self,
         from_table: String,
         to_table: String,
-        columns: Vec<(String, String)>,
+        joins: Vec<Join>,
     ) -> Result<(), String> {
         if !self.tables.contains_key(&from_table) || !self.tables.contains_key(&to_table) {
             return Err("Table does not exists".into());
         }
 
-        let mut _ca = vec![];
-        let mut _cb = vec![]; 
-
-        columns.iter().for_each(|col_t| {
-            _ca.push(col_t.0.clone());
-            _cb.push(col_t.1.clone());
-        });
         let new_rel = Relationship {
             table_a: from_table.clone(),
             table_b: to_table.clone(),
-            columns: columns.clone(),
+            columns: joins.clone(),
         };
         for i in 0..self.relationships.len() {
             if new_rel == self.relationships[i] {
@@ -82,35 +86,13 @@ impl SemanticModel {
         }
         self.relationships.push(new_rel);
 
-        if let (Some(table_1), Some(table_2)) =
-            (self.tables.get(&from_table), self.tables.get(&to_table))
-        {
-            let from_cols = table_1
-                .columns
-                .iter()
-                .filter(|col| _ca.contains(&col.column))
-                .collect::<Vec<&Column>>();
-            let to_cols = table_2
-                .columns
-                .iter()
-                .filter(|col| _cb.contains(&col.column))
-                .collect::<Vec<&Column>>();
-
-            let mut joins: Vec<Join> = vec![];
-            for i in 0..from_cols.len() {
-                joins.push(Join {
-                    from_column: from_cols[i].clone(),
-                    to_column: to_cols[i].clone(),
-                });
-            }
-            if let Some(table) = self.tables.get_mut(&from_table) {
-                table.relationships.insert(to_table.clone(), joins.clone());
-            }
-            if let Some(table) = self.tables.get_mut(&to_table) {
-                table
-                    .relationships
-                    .insert(from_table.clone(), joins.clone());
-            }
+        if let Some(table) = self.tables.get_mut(&from_table) {
+            table.relationships.insert(to_table.clone(), joins.clone());
+        }
+        if let Some(table) = self.tables.get_mut(&to_table) {
+            table
+                .relationships
+                .insert(from_table.clone(), joins.clone());
         }
         Ok(())
     }
@@ -158,30 +140,37 @@ impl SemanticModel {
                 .clone()
                 .columns
                 .into_iter()
-                .map(|col| col.column)
-                .collect::<Vec<String>>();
+                .map(|col| col)
+                .collect::<Vec<Column>>();
 
             for (target_table_name, target_table) in &self.tables {
                 if target_table_name == table_name {
                     continue;
                 }
-                let join_columns = target_table
+                let mut joins = vec![];
+
+                target_table
                     .clone()
                     .columns
                     .into_iter()
-                    .filter(|t_col| columns.contains(&t_col.column))
-                    .map(|t_col| t_col.column)
-                    .collect::<Vec<String>>();
+                    .for_each(|t_col| {
+                        match columns.iter().find(|s_col| s_col == &&t_col) {
+                            Some(col) => {
+                                joins.push(Join {from_column: col.clone(), to_column: t_col});
+                            },
+                            None => (),
+                        }
+                    });
+
                 let potential_rel = Relationship {
                     table_a: table_name.clone(),
-                    columns: join_columns.clone(),
                     table_b: target_table_name.clone(),
-                    columns_b: join_columns.clone(),
+                    columns: joins.clone(),
                 };
 
                 if !self.relationships.contains(&potential_rel)
                     && !result.contains(&potential_rel)
-                    && join_columns.len() > 0 as usize
+                    && joins.len() > 0 as usize
                 {
                     result.push(potential_rel);
                 }
@@ -221,7 +210,7 @@ impl SemanticModel {
 pub struct Relationship {
     table_a: String,
     table_b: String,
-    columns: Vec<(String, String)>,
+    columns: Vec<Join>,
 }
 
 impl PartialEq for Relationship {

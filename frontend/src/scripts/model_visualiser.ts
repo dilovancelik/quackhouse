@@ -58,9 +58,10 @@ const createMap = (model: SemanticModelHandle) => {
 
     cy.on("tap", "edge", (e) => {
         const data: CYEventData = e.target.data();
-        let relationship: Relationship[] = JSON.parse(model.get_relationship(data.source, data.target));
+        const res = model.get_relationship(data.source, data.target)
 
-        console.log(relationship);
+        let relationship: Relationship[] = JSON.parse(res);
+
         updateRelationship(relationship);
 
     });

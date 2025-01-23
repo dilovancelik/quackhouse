@@ -66,15 +66,41 @@ impl SemanticModelHandle {
         &self,
         from_table: String,
         to_table: String,
-        columns: Vec<(String, String)>,
+        json_joins: String,
     ) -> Result<String, JsError> {
         let mut model = self.model.borrow_mut();
 
-        match model.add_update_relationship(
-            from_table.clone(),
-            to_table.clone(),
-            columns,
-        ) {
+        let wasm_joins = match serde_json::from_str::<Vec<(ColumnWasm, ColumnWasm)>>(&json_joins) {
+            Ok(val) => val,
+            Err(e) => return Err(JsError::new(&e.to_string())),
+        };
+
+        let mut joins = vec![];
+        
+        wasm_joins.iter().for_each(|j| {
+            let _from_table = model.tables.get(&from_table).unwrap();
+
+            let from_dummy_col = Column {
+                table: "dummy".to_string(),
+                column: j.0.name.clone(),
+                data_type: j.0.data_type.clone(),
+                description: None,
+            };
+            let from_col = _from_table.columns.iter().find(|c| c == &&from_dummy_col).unwrap();
+            
+            let _to_table = model.tables.get(&to_table).unwrap();
+            let to_dummy_col = Column {
+                table: "dummy".to_string(),
+                column: j.1.name.clone(),
+                data_type: j.1.data_type.clone(),
+                description: None,
+            };
+            let to_col = _to_table.columns.iter().find(|c| c == &&to_dummy_col).unwrap();
+
+            joins.push(Join { from_column: from_col.clone(), to_column: to_col.clone() });
+        });
+
+        match model.add_update_relationship(from_table.clone(), to_table.clone(), joins) {
             Ok(()) => Ok(format!(
                 "Relationship between {} and {} successfully created",
                 from_table, to_table

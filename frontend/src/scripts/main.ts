@@ -161,16 +161,14 @@ const validateAndCreateRelationship = (model: SemanticModelHandle) => {
         throw new Error("You must select atleast 1 column on each side");
     }
 
-    let columns_a = [];
-    let columns_b = [];
+    let joins = [];
 
     for (let i = 1; i <= column_a_len; i++) {
         let a = retrieved_column_a.get(i)!;
         let b = retrieved_column_b.get(i)!;
 
         if (a.data_type == b.data_type) {
-            columns_a.push(a.name);
-            columns_b.push(b.name);
+            joins.push([a, b])
         } else {
             throw new Error(
                 `Columns must have the same type ${a.name} is of type ${a.data_type}, and ${b.name} is of type ${b.data_type}`,
@@ -178,7 +176,7 @@ const validateAndCreateRelationship = (model: SemanticModelHandle) => {
         }
     }
 
-    model.add_update_relationship(table_a, table_b, columns_a, columns_b);
+    model.add_update_relationship(table_a, table_b, JSON.stringify(joins));
 };
 
 document.getElementById("import_data_button")?.addEventListener("click", () => {
@@ -196,7 +194,7 @@ document.getElementById("log_model")?.addEventListener("click", () => {
 });
 
 document.addEventListener("click", (e: Event) => {
-    // Event listener to close any open modal, if mouse click
+    // Event listener to c any open modal, if mouse click
     // happens outside modal
     const target_element = <HTMLElement>e.target!;
     if (target_element.classList.contains("modal")) {
