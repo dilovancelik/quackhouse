@@ -4,7 +4,6 @@ use std::{cell::RefCell, collections::HashMap};
 use wasm_bindgen::prelude::*;
 use web_sys::*;
 
-use crate::query_builder::*;
 use crate::semantic_model::*;
 
 #[derive(serde::Serialize)]
@@ -127,12 +126,17 @@ impl SemanticModelHandle {
     }
 
     #[wasm_bindgen]
-    pub fn parse_json_query(&self, query: Query) -> Result<String, JsError> {
+    pub fn parse_json_query(&self, query: String) -> Result<String, JsError> {
         let model = self.model.borrow();
+        
+        let query_obj = match serde_json::from_str(&query) {
+            Ok(q) => q,
+            Err(e) => return Err(JsError::new(e.to_string().as_str()))
+        };
 
-        match model.parse_json_query(query) {
+        match model.parse_json_query(query_obj) {
             Ok(query) => Ok(query),
-            Err(e) => return Err(JsError::new(e.to_string().as_str())),
+            Err(e) => Err(JsError::new(e.to_string().as_str())),
         }
     }
 

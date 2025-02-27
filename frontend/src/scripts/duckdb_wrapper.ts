@@ -18,6 +18,7 @@ const createTablesFromFiles = async (files: FileList) => {
     sessionStorage.setItem("loaded_files", loaded_files.toString());
 
     var progress_bar = document.getElementById("progress_bar")!;
+    var visualize_table = document.getElementById("visualize_table_group")!;
     progress_bar.dispatchEvent(new CustomEvent("progress_bar_display_update", { detail: "flex" }));
 
     const creation_event = new CustomEvent("table_creation_event");
@@ -32,6 +33,7 @@ const createTablesFromFiles = async (files: FileList) => {
             sessionStorage.setItem(`table_${res[0]}`, res[1].outerHTML)
             if (loaded_files === files.length) {
                 progress_bar.dispatchEvent(new CustomEvent("table_creation_finished"));
+                visualize_table.dispatchEvent(new CustomEvent("table_creation_finished"));
                 createMap(model);
             } else {
                 progress_bar.dispatchEvent(creation_event);
@@ -98,25 +100,26 @@ const createDuckDBTable = async (file: File, db: AsyncDuckDB, model: SemanticMod
     return [name, return_html];
 }
 
-/*
-const executeQuery = async (query: Query): HTMLElement => {
-    let db = await initDB();
-    let model = initModel(null);
-    const duckdb_query = model.parse_json_query(query);
-
+const executeQuery = async (query: string): Promise<HTMLElement> => {
     let result_html: HTMLElement;
-    await db.connect()
-        .then((conn) => {
-            conn.query(duckdb_query)
-                .then((result) => { result_html = arrowToHTML(result, "Result") })
-                .catch((error) => { result_html = errorToHTML(error) })
-                .finally(() => { conn.close() })
-        })
-        .catch((error) => { result_html = errorToHTML(error) });
+    try {
+        let db = await initDB();
+
+        const conn = await db.connect();
+        const result = await conn.query(query)
+        try {
+            result_html = arrowToHTML(result, "Result");
+        } catch(error) { 
+            result_html = errorToHTML(error as Error) 
+        } finally {
+            conn.close();
+        }
+    } catch (error) {
+        result_html = errorToHTML(error as Error);
+    } 
 
     return result_html;
 }
-*/
 
 const arrowToHTML = (result: Table<any>, table_name: string): HTMLElement => {
     const data = JSON.parse(result.toString());
@@ -175,4 +178,4 @@ const errorToHTML = (error: Error): HTMLElement => {
     return htmlError;
 }
 
-export { createTablesFromFiles, arrowToHTML };
+export { createTablesFromFiles, arrowToHTML, executeQuery };

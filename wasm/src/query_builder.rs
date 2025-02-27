@@ -174,7 +174,7 @@ pub fn sql_builder(query: Query, data_model: &SemanticModel) -> Result<String, J
 
     let mut select_stmt: String = String::from("SELECT ");
     select_stmt.push_str(labels.join(",\n\t").as_str());
-    if !labels.is_empty() {
+    if !aggregations.is_empty() {
         select_stmt.push_str(",\n\t")
     }
     select_stmt.push_str(aggregations.join(",").as_str());

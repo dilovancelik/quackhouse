@@ -14,7 +14,7 @@
             <div class="navigation_row">
                 <a type="button" id="about_button">About</a>
                 <a type="button" id="datamodel_button">Data Modelling</a>
-                <a type="button">Visualize</a>
+                <a type="button" id="visualize_button">Visualize</a>
                 <a type="button" id="log_model">Download Model</a>
             </div>
             <section id="about" class="about">
@@ -97,7 +97,13 @@
                     </div>
                 </div>
             </section>
-            <section id="visualize" class="visualize"></section>
+            <section id="visualize" class="visualize" style="display: none">
+                <div class="columns_container visualize_columns_container">
+                    <div id="visualize_table_group" class="table_group">
+                    </div>
+                </div>
+                <div id="visualization-area" class="visualization-area"></div>
+            </section>
         </div>
         <input type="file" name="files" id="files" accept=".json, .csv, .parquet" style="display: none" multiple />
 
@@ -106,6 +112,7 @@
                 <span id="close_table" class="close">&times;</span>
                 <h2>Import Data to Create Table</h2>
                 <p>Upload one or multiple CSV, Parquet or JSON file to create a table</p>
+
                 <div id="progress_bar" class="progress_bar">
                     <progress id="table_creation_bar" class="table_creation" max="1" value="0.05"></progress>
                     <br />
