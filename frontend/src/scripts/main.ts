@@ -174,7 +174,7 @@ const showHideTablesInList = () => {
 const generateQuery = (): string => {
     const model = initModel(null);
     const selectTables = document.getElementById("visualize_table_group")!;
-
+    
     let query: { [id: string]: any[] } = {
         labels: [],
         aggregations: [],
@@ -193,6 +193,11 @@ const generateQuery = (): string => {
             });
         });
     }
+
+    if (query['labels'].length == 0) {
+        return "";
+    }
+
 
     const sql_query = model.parse_json_query(JSON.stringify(query));
     console.log(sql_query);
@@ -269,8 +274,8 @@ const validateAndCreateRelationship = (model: SemanticModelHandle) => {
             );
         }
     }
-
     model.add_update_relationship(table_a, table_b, JSON.stringify(columns));
+
     showHideTablesInList();
 };
 
