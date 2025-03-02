@@ -1,6 +1,6 @@
 import { initDB } from "./duckdb";
 import { AsyncDuckDB } from "@duckdb/duckdb-wasm";
-import { Grid } from "gridjs";
+import { Grid, html } from "gridjs";
 
 import { ApexGrid } from "apex-grid";
 ApexGrid.register();
@@ -169,39 +169,48 @@ const arrowToHTML = (result: Table<any>, table_name: string): HTMLElement => {
     return table_definition;
 };
 
-
-const arrowToHTMLGeneral = (result: Table<any>) => {
+const arrowToHTMLGeneral = (result: Table<any>): HTMLTableElement => {
     const data = JSON.parse(result.toString());
 
     console.log(data);
 
-    const wrapper = document.createElement("div");
+    const table = document.createElement("table");
+    const header = document.createElement("thead");
+    const headerRow = document.createElement("tr");
+    Object.keys(data[0]).forEach((col) => {
+        const header_cell = document.createElement("div");
+        const hc_name = document.createElement("th");
+        hc_name.innerText = col;
+        header_cell.appendChild(hc_name);
+        const hc_drop = document.createElement("select");
+        const agg_option = document.createElement("option");
+        agg_option.innerText = "Aggregation";
+        hc_drop.appendChild(agg_option);
 
+        const fil_option = document.createElement("option");
+        fil_option.innerText = "Filter";
+        hc_drop.appendChild(fil_option);
+        
+        header_cell.appendChild(hc_drop);
 
-    const columns = Object.keys(data[0]).map((col) => ({"id": col , "name": col }));
+        headerRow.appendChild(header_cell);
+    });
+    header.appendChild(headerRow);
+    table.appendChild(header);
+    
+    data.forEach((row: any) => {
+        const table_row = document.createElement("tr");
+        Object.keys(row).forEach((cell) => {
+            const table_cell = document.createElement("td");
+            table_cell.innerText = row[cell];
+            table_row.appendChild(table_cell);
+        })
+        table.appendChild(table_row);
+        
+    });
 
-    new Grid({
-        columns: columns,
-
-        style: {
-            td: {
-                "min-width": "150px",
-            },
-            table: {
-                "white-space": "nowrap",
-            },
-        },
-
-        pagination: {
-            limit: 100,
-        },
-        data: data,
-        sort: true,
-        fixedHeader: true,
-    }).render(wrapper);
-
-    return wrapper;
-}
+    return table;
+};
 const errorToHTML = (error: Error): HTMLElement => {
     const htmlError = document.createElement("small");
     htmlError.innerHTML = error.message

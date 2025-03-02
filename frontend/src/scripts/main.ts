@@ -194,16 +194,16 @@ const generateQuery = (): string => {
         });
     }
 
+    const result_area = document.getElementById("visualization-area")!;
+    result_area.innerHTML = "";
     if (query['labels'].length == 0) {
         return "";
     }
 
 
-    const sql_query = model.parse_json_query(JSON.stringify(query));
-    console.log(sql_query);
-    const result_area = document.getElementById("visualization-area")!;
+    var sql_query = model.parse_json_query(JSON.stringify(query));
+    sql_query = sql_query.concat("\nLIMIT 100;")
     executeQuery(sql_query).then((result) => {
-        result_area.innerHTML = "";
         result_area.appendChild(result);
     });
     return JSON.stringify(query);
