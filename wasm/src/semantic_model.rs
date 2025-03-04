@@ -24,7 +24,7 @@ impl PartialEq for Column {
 
 impl fmt::Display for Column {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}.{}", self.table, self.column)
+        write!(f, "{}.\"{}\"", self.table, self.column)
     }
 }
 

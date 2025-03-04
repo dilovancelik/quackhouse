@@ -1,5 +1,6 @@
 use crate::semantic_model::{Column, SemanticModel};
 use serde::{Deserialize, Serialize};
+use web_sys::console;
 use std::{fmt, str::FromStr};
 use wasm_bindgen::prelude::*;
 
@@ -14,6 +15,7 @@ impl fmt::Display for Aggregation {
         if self.aggregation_type == AggregationType::Count {
             write!(f, "count() {}", self.column.column)
         } else {
+            
             write!(
                 f,
                 "{}({}) {}",
@@ -23,7 +25,7 @@ impl fmt::Display for Aggregation {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Serialize, Deserialize)]
 struct Filter {
     column: Column,
     negate: bool,
@@ -43,7 +45,7 @@ impl fmt::Display for Filter {
                 );
                 write!(
                     f,
-                    "{} ({} = {})",
+                    "{} {} = {}",
                     negate_str,
                     self.column,
                     self.values.first().unwrap()
@@ -55,7 +57,7 @@ impl fmt::Display for Filter {
                     "In operator should have atleast one value"
                 );
                 let values = self.values.join(", ");
-                write!(f, "{} ({} in ({}))", negate_str, self.column, values)
+               write!(f, "{} {} in ({})", negate_str, self.column, values)
             }
             OperatorType::Between => {
                 assert_eq!(
@@ -65,7 +67,7 @@ impl fmt::Display for Filter {
                 );
                 write!(
                     f,
-                    "{} ({} between {} and {})",
+                    "{} {} between {} and {}",
                     negate_str, self.column, self.values[0], self.values[1]
                 )
             }
@@ -85,9 +87,9 @@ impl FromStr for OperatorType {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
-            "eq" => Ok(Self::Equal),
-            "between" => Ok(Self::Between),
-            "in" => Ok(Self::In),
+            "Equal" => Ok(Self::Equal),
+            "Between" => Ok(Self::Between),
+            "In" => Ok(Self::In),
             _ => Err(()),
         }
     }
@@ -143,6 +145,8 @@ pub fn sql_builder(query: Query, data_model: &SemanticModel) -> Result<String, J
     let mut labels: Vec<String> = Vec::new();
     let mut filters: Vec<String> = Vec::new();
 
+    console::log_1(&JsValue::from_str(format!("{}", query.filters.len()).as_str()));
+
     query.aggregations.iter().for_each(|agg| {
         if !tables.contains(&agg.column.table) {
             tables.push(agg.column.table.clone());
@@ -162,7 +166,7 @@ pub fn sql_builder(query: Query, data_model: &SemanticModel) -> Result<String, J
     });
 
     query.filters.iter().for_each(|filter| {
-        if filters.contains(&filter.to_string()) {
+        if !filters.contains(&filter.to_string()) {
             filters.push(filter.to_string())
         }
     });
@@ -174,18 +178,15 @@ pub fn sql_builder(query: Query, data_model: &SemanticModel) -> Result<String, J
 
     let mut select_stmt: String = String::from("SELECT ");
     select_stmt.push_str(
-        labels
-            .iter()
-            .map(|x| x.split(".").collect::<Vec<&str>>())
-            .map(|x| format!("{}.\"{}\"", x[0], x[1]))
-            .collect::<Vec<String>>().join(",\n\t").as_str());
-    if !aggregations.is_empty() {
+        labels.join(",\n\t").as_str());
+
+    if !aggregations.is_empty() && !labels.is_empty() {
         select_stmt.push_str(",\n\t")
     }
     select_stmt.push_str(aggregations.join(",").as_str());
 
     let mut group_by_stmt: String = String::from("");
-    if !aggregations.is_empty() {
+    if !aggregations.is_empty() && !labels.is_empty() {
         group_by_stmt.push_str("GROUP BY ");
         group_by_stmt.push_str(labels.join(",\n\t").as_str());
     }
@@ -219,6 +220,7 @@ fn generate_from_stmt(
 
     for table in tables.iter().skip(1) {
         let mut table_joins = vec![format!("\tJOIN {} ON", table)];
+
         let relationships = match &data_model.tables.get(table) {
             Some(relationships) => &relationships.relationships,
             None => {
@@ -238,15 +240,16 @@ fn generate_from_stmt(
                     .map(|join| format!(" {}", &join.to_string()))
                     .collect::<Vec<String>>()
                     .join("\n\t\tAND");
-                joins.push_str(table_join_str.as_str());
-            } else {
-                return Err(JoinError {
-                    message: format!(
-                        "No relastionship exists between {} and {}",
-                        previous_table, table
-                    ),
-                });
+                joins.push_str(format!("{}\n", table_join_str.as_str()).as_str());
             }
+        }
+        if joins == "" {
+            return Err(JoinError {
+                message: format!(
+                    "No relastionship exists for table {}",
+                    table
+                ),
+            });
         }
         previous_tables.push(table);
         table_joins.push(joins);

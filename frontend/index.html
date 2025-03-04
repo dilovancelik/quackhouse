@@ -98,11 +98,18 @@
                 </div>
             </section>
             <section id="visualize" class="visualize" style="display: none">
-                <div class="columns_container visualize_columns_container">
-                    <div id="visualize_table_group" class="table_group">
+                <div class="visualize_columns_container">
+                    <button type="button" id="filter_button">Add Filter</button>
+                    <div class="columns_container visualize_columns_container">
+                        <div id="visualize_table_group" class="table_group"></div>
                     </div>
                 </div>
-                <div id="visualization-area" class="visualization-area">Your table will be shown here</div>
+
+                <div id="visualization-area" class="visualization-area">
+                    <small id="visualization-messages"></small>
+                    <br />
+                    <div id="visualization-table"></div>
+                </div>
             </section>
         </div>
         <input type="file" name="files" id="files" accept=".json, .csv, .parquet" style="display: none" multiple />
@@ -154,6 +161,46 @@
             <div class="modal_content">
                 <span id="close_table_summary" class="close">&times;</span>
                 <div id="table_summary"></div>
+            </div>
+        </div>
+        <div id="filter_modal" class="modal">
+            <div class="modal_content">
+                <span id="close_filter" class="close">&times;</span>
+                <h2>Chose table and apply filter</h2>
+                <div id="filter_choser">
+                    <div class="filter_input_group columns_container">
+                        <div class="filter_input">
+                            <label for="filter_table">Table</label>
+                            <select id="filter_table"></select>
+                        </div>
+                        <div class="filter_input">
+                            <label for="filter_column">Column</label>
+                            <select id="filter_column"></select>
+                        </div>
+                        <div class="filter_input">
+                            <label for="filter_type">Operator Type</label>
+                            <select id="filter_type">
+                                <option value="Equal">EQUALS</option>
+                                <option value="Between">BETWEEN</option>
+                                <option value="In">IN</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div id style="display: block">
+                        <h3>Filter Value</h3>
+                        <input type="number" id="filter_value_first" value="" class="filter_value" />
+                        <h5 id="and_filter" class="filter_value">AND</h5>
+                        <input type="number" id="filter_value_second" value="" class="filter_value" />
+                        <div class="columns_container filter_value" id="filter_value_multiple_container">
+                            <input type="text" id="search_list" placeholder="Search...">
+                            <ul id="filter_value_multiple"></ul>
+                        </div>
+                    </div>
+                    <div id="filters"></div>
+                </div>
+                <div class="modal_buttons">
+                    <button type="button" id="apply_filter">Apply</button>
+                </div>
             </div>
         </div>
 
