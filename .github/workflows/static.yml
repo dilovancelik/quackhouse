@@ -44,8 +44,6 @@ jobs:
         run: npm ci
       - name: Build
         run: npm run build
-      - name: Replace Assets folder
-        run: sed 's/"\/assets\/index/"\/quackhouse\/assets\/index/g' dist/index.html > temp.html && mv temp.html dist/index.html
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Upload artifact
