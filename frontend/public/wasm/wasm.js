@@ -93,12 +93,6 @@ function takeFromExternrefTable0(idx) {
     return value;
 }
 
-function _assertClass(instance, klass) {
-    if (!(instance instanceof klass)) {
-        throw new Error(`expected instance of ${klass.name}`);
-    }
-}
-
 function getArrayJsValueFromWasm0(ptr, len) {
     ptr = ptr >>> 0;
     const mem = getDataViewMemory0();
@@ -307,16 +301,16 @@ export class SemanticModelHandle {
         }
     }
     /**
-     * @param {Query} query
+     * @param {string} query
      * @returns {string}
      */
     parse_json_query(query) {
         let deferred3_0;
         let deferred3_1;
         try {
-            _assertClass(query, Query);
-            var ptr0 = query.__destroy_into_raw();
-            const ret = wasm.semanticmodelhandle_parse_json_query(this.__wbg_ptr, ptr0);
+            const ptr0 = passStringToWasm0(query, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+            const len0 = WASM_VECTOR_LEN;
+            const ret = wasm.semanticmodelhandle_parse_json_query(this.__wbg_ptr, ptr0, len0);
             var ptr2 = ret[0];
             var len2 = ret[1];
             if (ret[3]) {
@@ -527,6 +521,9 @@ async function __wbg_load(module, imports) {
 function __wbg_get_imports() {
     const imports = {};
     imports.wbg = {};
+    imports.wbg.__wbg_log_464d1b2190ca1e04 = function(arg0) {
+        console.log(arg0);
+    };
     imports.wbg.__wbindgen_error_new = function(arg0, arg1) {
         const ret = new Error(getStringFromWasm0(arg0, arg1));
         return ret;

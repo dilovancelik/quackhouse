@@ -216,6 +216,12 @@ button:focus-visible {
     margin-bottom: 5%;
 }
 
+.visualize {
+    grid-row: 3 / 4;
+    grid-column: 1 / 5;
+    overflow: wrap;
+    margin-bottom: 5%;
+}
 /* Modal background overlay */
 .modal {
     display: none;
@@ -257,10 +263,19 @@ button:focus-visible {
     color: #aaa;
 }
 
+.close_relative {
+    margin-left: 10px;
+    cursor: pointer;
+    color: #aaa;
+}
+
 .close:hover {
     color: #000;
 }
 
+.close_relative:hover {
+    color: #000;
+}
 .modal_content button {
     background-color: #444;
 }
@@ -331,24 +346,21 @@ button:focus-visible {
     border: 1px solid #ccc;
     border-radius: 6px;
     font-size: 16px;
-    background-color: #fff;
+    background-color: #242424;
     cursor: pointer;
     transition: border-color 0.3s ease;
     width: 100%;
     box-sizing: border-box;
 }
-/*
-.columns_container select:hover,
-.columns_container select:focus {
-    border-color: #646cff;
-    outline: none;
+
+#filter_choser .columns_container {
+    min-width: 10%;
 }
-*/
 .columns_container ul {
     list-style-type: none;
     padding: 0;
     margin: 0;
-    background: #fff;
+    background: #444;
     border: 1px solid #ccc;
     border-radius: 6px;
     min-width: 100%;
@@ -367,18 +379,17 @@ button:focus-visible {
         color 0.3s ease;
 }
 
-
 .columns_container li:last-child {
     border-bottom: none;
 }
 .columns_container li:hover {
-    background-color: #f0f8ff;
+    background-color: #535bf2;
 }
 
 .columns_container li.selected {
-    background-color: #f0f8ff;
+    background-color: #444;
     font-weight: bold;
-    border-left: 4px solid #646cff;
+    border-left: 4px solid #f0f8ff;
 }
 
 .columns_container {
@@ -393,6 +404,94 @@ button:focus-visible {
 .columns_container:hover {
     border-color: #646cff;
 }
+
+@media (prefers-color-scheme: light) {
+    .columns_container ul {
+        background: #fff;
+        border: 1px solid #ccc;
+    }
+
+    .columns_container li {
+        background: #fff;
+        border-bottom: 1px solid #e6e6e6;
+    }
+
+    .columns_container ul.selected {
+        background-color: #fff;
+    }
+
+    .columns_container li.selected {
+        display: flex;
+        background-color: #fff;
+        font-weight: bold;
+        border-left: 4px solid #646cff;
+    }
+
+    .columns_container select {
+        background-color: #fff;
+    }
+
+    #visualize .columns_container select {
+        text-align-last: right;
+        border: none;
+        padding: none;
+        cursor: pointer;
+        min-width: 20%;
+        max-width: 40%;
+        margin-left: auto;
+        margin-right: 0;
+    }
+    .columns_container:hover {
+        border-color: #646cff;
+    }
+}
+
 .join_container {
     position: relative;
+}
+
+.visualize_columns_container {
+    grid-column: 1/1;
+}
+
+.visualization-area {
+    grid-column: 2/5;
+}
+
+.filter-area {
+    grid-column: 5/6;
+    margin-right: 0;
+}
+
+.visualize {
+    display: none;
+    grid-row: 3/4;
+    grid-column: 1/5;
+    width: 90vw;
+    height: 80vh;
+    margin-bottom: 5%;
+}
+
+.disabled {
+    pointer-events: none;
+    opacity: 0.5;
+}
+
+.filter_value {
+    min-width: 10%;
+    display: none;
+    margin: 5px;    
+}
+
+.filter_input {
+    display: block;
+    min-width: 25%;
+}
+.filter_input_group {
+    display: flex;
+    justify-content: left;
+}
+
+#filter_choser {
+    display: block;
 }
