@@ -166,6 +166,9 @@ pub fn sql_builder(query: Query, data_model: &SemanticModel) -> Result<String, J
     });
 
     query.filters.iter().for_each(|filter| {
+        if !tables.contains(&filter.column.table) {
+            tables.push(filter.column.table.clone());
+        }
         if !filters.contains(&filter.to_string()) {
             filters.push(filter.to_string())
         }
