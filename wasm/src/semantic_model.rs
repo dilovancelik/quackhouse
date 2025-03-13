@@ -13,11 +13,7 @@ pub struct Column {
 
 impl PartialEq for Column {
     fn eq(&self, other: &Self) -> bool {
-        if self.column == other.column && self.data_type == other.data_type {
-            return true
-        } else {
-            return false
-        }
+        self.column == other.column && self.data_type == other.data_type
     }
     
 }
@@ -140,7 +136,6 @@ impl SemanticModel {
                 .clone()
                 .columns
                 .into_iter()
-                .map(|col| col)
                 .collect::<Vec<Column>>();
 
             for (target_table_name, target_table) in &self.tables {
@@ -154,11 +149,8 @@ impl SemanticModel {
                     .columns
                     .into_iter()
                     .for_each(|t_col| {
-                        match columns.iter().find(|s_col| s_col == &&t_col) {
-                            Some(col) => {
-                                joins.push(Join {from_column: col.clone(), to_column: t_col});
-                            },
-                            None => (),
+                        if let Some(col) = columns.iter().find(|s_col| s_col == &&t_col) {
+                            joins.push(Join {from_column: col.clone(), to_column: t_col});
                         }
                     });
 
@@ -170,7 +162,7 @@ impl SemanticModel {
 
                 if !self.relationships.contains(&potential_rel)
                     && !result.contains(&potential_rel)
-                    && joins.len() > 0 as usize
+                    && !joins.is_empty()
                 {
                     result.push(potential_rel);
                 }

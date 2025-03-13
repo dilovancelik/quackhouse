@@ -246,7 +246,7 @@ fn generate_from_stmt(
                 joins.push_str(format!("{}\n", table_join_str.as_str()).as_str());
             }
         }
-        if joins == "" {
+        if joins.is_empty() {
             return Err(JoinError {
                 message: format!(
                     "No relastionship exists for table {}",
