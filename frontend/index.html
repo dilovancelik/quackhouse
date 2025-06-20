@@ -21,9 +21,11 @@
                 <div style="padding-left: 10vw; padding-right: 10vw">
                     <h1>About Us</h1>
                     <p>
-                        Welcome to our project, the open-source solution for streamlined and efficient data modeling.
-                        Our mission is to empower users with the ability to explore, transform, and understand their
-                        data entirely on their own terms, without compromising privacy or performance.
+                        Welcome to my project, the open-source solution for data modeling. Previously I've built an
+                        website where you could upload your files and interact with them in duckdb. The feedback from
+                        that tool was that people weren't necesarily happy with having to write sql. Therefore I've
+                        built this new version, where you can define relationships between tables and then interact with
+                        them through a UI.
                     </p>
                     <p>
                         Built on cutting-edge technologies like DuckDB, Rust, and WebAssembly, our platform runs
@@ -31,24 +33,6 @@
                         power of modern client-side processing, we provide a robust and secure environment for managing
                         data while maintaining lightning-fast performance.
                     </p>
-
-                    <h2>Our Vision</h2>
-                    <p>We believe data modeling should be:</p>
-                    <ul>
-                        <li>
-                            <strong>Accessible</strong>: Open-source and free for everyone to use and contribute to.
-                        </li>
-                        <li><strong>Private</strong>: Your data stays local, ensuring complete control and privacy.</li>
-                        <li>
-                            <strong>Efficient</strong>: Leveraging the speed and scalability of DuckDB and Rust to
-                            handle even the most complex datasets effortlessly.
-                        </li>
-                        <li>
-                            <strong>User-Friendly</strong>: Designed with simplicity and usability in mind, making data
-                            modeling intuitive for all skill levels.
-                        </li>
-                    </ul>
-
                     <h2>Key Features</h2>
                     <ul>
                         <li>
@@ -63,28 +47,16 @@
                             <strong>Cross-Platform Compatibility</strong>: Runs seamlessly on any modern browser without
                             requiring additional installations.
                         </li>
-                        <li>
-                            <strong>Open-Source Community</strong>: Developed transparently, with contributions from
-                            developers around the world.
-                        </li>
                     </ul>
 
-                    <h2>Why We Built This</h2>
+                    <h2>Let me know what you think.</h2>
                     <p>
-                        In a world increasingly driven by data, we recognized the need for tools that combine power and
-                        simplicity without sacrificing privacy. Our project bridges the gap, providing an open,
-                        local-first solution for anyone looking to model and analyze their data effectively.
-                    </p>
+                        This is just a POC, and I don't know what to do with it the next. If you have any great ideas I
+                        would love to hear from you. You can reach me on
+                        <a href="https://bsky.app/profile/dilovancelik.bsky.social">bluesky</a> or
+                        <a href="https://www.linkedin.com/in/dilovancelik/">linkedin</a>.
 
-                    <h2>Join Us</h2>
-                    <p>
-                        We’re more than just a tool – we’re a community of data enthusiasts, developers, and innovators.
-                        Whether you want to contribute to the project, suggest features, or simply explore its
-                        capabilities, we welcome you to be a part of our journey.
-                    </p>
-
-                    <p>
-                        Discover the future of data modeling today – built for you, powered by open-source technology.
+                        All code is available on <a href="https://github.com/dilovancelik/quackhouse">github</a>
                     </p>
                 </div>
             </section>
@@ -192,7 +164,7 @@
                         <h5 id="and_filter" class="filter_value">AND</h5>
                         <input type="number" id="filter_value_second" value="" class="filter_value" />
                         <div class="columns_container filter_value" id="filter_value_multiple_container">
-                            <input type="text" id="search_list" placeholder="Search...">
+                            <input type="text" id="search_list" placeholder="Search..." />
                             <ul id="filter_value_multiple"></ul>
                         </div>
                     </div>
