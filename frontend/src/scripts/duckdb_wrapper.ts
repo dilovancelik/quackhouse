@@ -120,6 +120,16 @@ const executeQuery = async (query: string): Promise<HTMLElement> => {
     return result_html;
 };
 
+const exportTable = async (table: string): Promise<Blob> => {
+    const db = await initDB();
+    const conn = await db.connect();
+    await db.registerEmptyFileBuffer(`${table}.parquet`);
+    await conn.send(`COPY (SELECT * FROM ${table}) TO '${table}.parquet' (FORMAT parquet)`);
+    const buffer = await db.copyFileToBuffer(`${table}.parquet`);
+    await conn.close();
+    return new Blob([buffer], { type: "application/octet-stream" });
+};
+
 const getUniqueValues = async (table: string, column: string): Promise<string[]> => {
     let result_html: string[];
 
@@ -130,7 +140,7 @@ const getUniqueValues = async (table: string, column: string): Promise<string[]>
         const conn = await db.connect();
         const result = await conn.query(query);
         try {
-            result_html = result.toArray().map(row => row[column]);
+            result_html = result.toArray().map((row) => row[column]);
         } catch (error) {
             result_html = [(error as Error).message];
         } finally {
@@ -227,4 +237,4 @@ const errorToHTML = (error: Error): HTMLElement => {
     return htmlError;
 };
 
-export { createTablesFromFiles, arrowToHTML, executeQuery, getUniqueValues };
+export { createTablesFromFiles, arrowToHTML, executeQuery, getUniqueValues, exportTable };

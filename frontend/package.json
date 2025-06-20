@@ -17,6 +17,7 @@
     "@duckdb/duckdb-wasm": "^1.29.0",
     "apex-grid": "^1.0.1",
     "cytoscape": "^3.30.4",
-    "gridjs": "^6.2.0"
+    "gridjs": "^6.2.0",
+    "jszip": "^3.10.1"
   }
 }

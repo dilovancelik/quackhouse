@@ -2,7 +2,9 @@ import { SemanticModelHandle } from "../../public/wasm/wasm";
 import "../styles/gridjs.css";
 import "../styles/style.css";
 
-import { createTablesFromFiles, executeQuery, getUniqueValues } from "./duckdb_wrapper";
+import JSZip from 'jszip';
+
+import { createTablesFromFiles, executeQuery, getUniqueValues, exportTable } from "./duckdb_wrapper";
 import { createMap } from "./model_visualiser";
 import { initModel } from "./semantic_layer";
 
@@ -415,10 +417,26 @@ document.getElementById("files")?.addEventListener("change", () => {
     processInputFiles();
 });
 
-document.getElementById("log_model")?.addEventListener("click", () => {
+document.getElementById("export_model")?.addEventListener("click", async () => {
     const model = initModel(null);
+    const model_name = model.get_name();
     const string_model = model.download_model();
-    console.log(string_model);
+    let zip = new JSZip();
+    zip.file("metadata.json", string_model);
+    const tables = model.get_table_names();
+
+    for (const name of tables) {
+        const content = await exportTable(name);
+        zip.file(`${name}.parquet`, content);
+    }
+
+    const blob = await zip.generateAsync({type: 'blob'});
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${model_name}.zip`
+    a.click()
 });
 
 document.addEventListener("click", (e: Event) => {
