@@ -1,8 +1,8 @@
 use crate::semantic_model::{Column, SemanticModel};
 use serde::{Deserialize, Serialize};
-use web_sys::console;
 use std::{fmt, str::FromStr};
 use wasm_bindgen::prelude::*;
+use web_sys::console;
 
 #[derive(Serialize, Deserialize)]
 struct Aggregation {
@@ -15,7 +15,6 @@ impl fmt::Display for Aggregation {
         if self.aggregation_type == AggregationType::Count {
             write!(f, "count() {}", self.column.column)
         } else {
-            
             write!(
                 f,
                 "{}({}) {}",
@@ -57,7 +56,7 @@ impl fmt::Display for Filter {
                     "In operator should have atleast one value"
                 );
                 let values = self.values.join(", ");
-               write!(f, "{} {} in ({})", negate_str, self.column, values)
+                write!(f, "{} {} in ({})", negate_str, self.column, values)
             }
             OperatorType::Between => {
                 assert_eq!(
@@ -145,7 +144,9 @@ pub fn sql_builder(query: Query, data_model: &SemanticModel) -> Result<String, J
     let mut labels: Vec<String> = Vec::new();
     let mut filters: Vec<String> = Vec::new();
 
-    console::log_1(&JsValue::from_str(format!("{}", query.filters.len()).as_str()));
+    console::log_1(&JsValue::from_str(
+        format!("{}", query.filters.len()).as_str(),
+    ));
 
     query.aggregations.iter().for_each(|agg| {
         if !tables.contains(&agg.column.table) {
@@ -180,8 +181,7 @@ pub fn sql_builder(query: Query, data_model: &SemanticModel) -> Result<String, J
     };
 
     let mut select_stmt: String = String::from("SELECT ");
-    select_stmt.push_str(
-        labels.join(",\n\t").as_str());
+    select_stmt.push_str(labels.join(",\n\t").as_str());
 
     if !aggregations.is_empty() && !labels.is_empty() {
         select_stmt.push_str(",\n\t")
@@ -248,10 +248,7 @@ fn generate_from_stmt(
         }
         if joins.is_empty() {
             return Err(JoinError {
-                message: format!(
-                    "No relastionship exists for table {}",
-                    table
-                ),
+                message: format!("No relastionship exists for table {}", table),
             });
         }
         previous_tables.push(table);

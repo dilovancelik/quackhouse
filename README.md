@@ -12,3 +12,8 @@ Built on cutting-edge technologies like DuckDB, Rust, and WebAssembly, our platf
 Let me know what you think.
 
 This is just a POC, and I don't know what to do with it the next. If you have any great ideas I would love to hear from you. You can reach me on bluesky or linkedin. 
+# test readme
+
+## Contributor Guide
+
+See `AGENTS.md` for repository guidelines, build instructions, and contributor expectations.
